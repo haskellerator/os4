@@ -353,11 +353,44 @@ iunlockput(struct inode *ip)
 
 // Return the disk block address of the nth block in inode ip.
 // If there is no such block, bmap allocates one.
+
+// static uint
+// bmap(struct inode *ip, uint bn)
+// {
+//   uint addr, *a;
+//   struct buf *bp;
+
+//   if(bn < NDIRECT){
+//     if((addr = ip->addrs[bn]) == 0)
+//       ip->addrs[bn] = addr = balloc(ip->dev);
+//     return addr;
+//   }
+//   bn -= NDIRECT;
+
+//   if(bn < NINDIRECT){
+//     // Load indirect block, allocating if necessary.
+//     if((addr = ip->addrs[NDIRECT]) == 0)
+//       ip->addrs[NDIRECT] = addr = balloc(ip->dev);
+//     bp = bread(ip->dev, addr);
+//     a = (uint*)bp->data;
+//     if((addr = a[bn]) == 0){
+//       a[bn] = addr = balloc(ip->dev);
+//       log_write(bp);
+//     }
+//     brelse(bp);
+//     return addr;
+//   }
+
+//   panic("bmap: out of range");
+// }
+
+// task1 changes
+
 static uint
 bmap(struct inode *ip, uint bn)
 {
-  uint addr, *a;
-  struct buf *bp;
+  uint addr, *a, *a2;
+  struct buf *bp, *bp2;
 
   if(bn < NDIRECT){
     if((addr = ip->addrs[bn]) == 0)
@@ -366,11 +399,14 @@ bmap(struct inode *ip, uint bn)
   }
   bn -= NDIRECT;
 
+  // this condition is for one level indirection
+
   if(bn < NINDIRECT){
     // Load indirect block, allocating if necessary.
-    if((addr = ip->addrs[NDIRECT]) == 0)
+    if((addr = ip->addrs[NDIRECT]) == 0){
       ip->addrs[NDIRECT] = addr = balloc(ip->dev);
-    bp = bread(ip->dev, addr);
+    }
+    bp = bread(ip->dev, addr); // reads the block
     a = (uint*)bp->data;
     if((addr = a[bn]) == 0){
       a[bn] = addr = balloc(ip->dev);
@@ -380,6 +416,39 @@ bmap(struct inode *ip, uint bn)
     return addr;
   }
 
+  // task1 addition
+  bn -= NINDIRECT;
+  if (bn < NNIINDIRECT){
+    uint lower_bits = bn & 0xF;
+    uint upper_bits = (bn >> 4) & 0xF;
+    if((addr = ip->addrs[NDIRECT+1]) == 0){
+      ip->addrs[NDIRECT+1] = addr = balloc(ip->dev);
+    }
+    bp = bread(ip->dev, addr); // reads the block
+    a = (uint*)bp->data;
+    if((addr = a[upper_bits]) == 0){
+      a[bn] = addr = balloc(ip->dev);
+      log_write(bp);
+    } 
+    /* until here acts like the conditional above
+     * in the way that it searched and allocated layer 1
+
+     * now the second level of indirection*/
+
+    // a is our block now
+
+    bp2 = bread(ip->dev,addr);
+    a2 = (uint*)bp->data;
+    if((addr = a2[lower_bits]) == 0){
+      a2[lower_bits] = addr = balloc(ip->dev);
+      log_write(bp);
+    }
+
+    brelse(bp2);
+    brelse(bp);
+    return addr;
+
+  }
   panic("bmap: out of range");
 }
 
