@@ -21,6 +21,11 @@ struct inode {
   short minor;
   short nlink;
   uint size;
+
+  /* task1 changes, added another pointer entry for the
+   * second level indirection
+   */
+
   uint addrs[NDIRECT+1];
 };
 #define I_BUSY 0x1
