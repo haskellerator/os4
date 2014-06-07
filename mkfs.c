@@ -11,10 +11,10 @@
 #include "stat.h"
 #include "param.h"
 
-int nblocks = 16481; // task1 changed from 985->20985 // 16485
+int nblocks = 985;//20985; // task1 changed from 985->20985 // 16485 not working, 4 too much// 16481 correction
 int nlog = LOGSIZE;
 int ninodes = 200;
-int size = 16524; // task1 changed from 1024->21029 // 16524 = 128*128 + 128 +12
+int size = 1024; // task1 changed from 1024->21029 // 16524 = 128*128 + 128 +12
 
 int fsfd;
 struct superblock sb;
@@ -92,6 +92,7 @@ main(int argc, char *argv[])
   printf("used %d (bit %d ninode %zu) free %u log %u total %d\n", usedblocks,
          bitblocks, ninodes/IPB + 1, freeblock, nlog, nblocks+usedblocks+nlog);
 
+  // printf("this is size %d\n",nblocks+usedblocks+nlog );
   assert(nblocks + usedblocks + nlog == size);
 
   for(i = 0; i < nblocks + usedblocks + nlog; i++)
