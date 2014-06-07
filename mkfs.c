@@ -11,10 +11,10 @@
 #include "stat.h"
 #include "param.h"
 
-int nblocks = 985;
+int nblocks = 16481; // task1 changed from 985->20985 // 16485
 int nlog = LOGSIZE;
 int ninodes = 200;
-int size = 1024;
+int size = 16524; // task1 changed from 1024->21029 // 16524 = 128*128 + 128 +12
 
 int fsfd;
 struct superblock sb;
@@ -55,13 +55,15 @@ xint(uint x)
   return y;
 }
 
+#define BUF_SIZE 512
+
 int
 main(int argc, char *argv[])
 {
   int i, cc, fd;
   uint rootino, inum, off;
   struct dirent de;
-  char buf[512];
+  char buf[BUF_SIZE];
   struct dinode din;
 
   if(argc < 2){
@@ -69,8 +71,8 @@ main(int argc, char *argv[])
     exit(1);
   }
 
-  assert((512 % sizeof(struct dinode)) == 0);
-  assert((512 % sizeof(struct dirent)) == 0);
+  assert((BUF_SIZE % sizeof(struct dinode)) == 0); // check that dinode is multi of blocksize
+  assert((BUF_SIZE % sizeof(struct dirent)) == 0);
 
   fsfd = open(argv[1], O_RDWR|O_CREAT|O_TRUNC, 0666);
   if(fsfd < 0){
@@ -83,7 +85,7 @@ main(int argc, char *argv[])
   sb.ninodes = xint(ninodes);
   sb.nlog = xint(nlog);
 
-  bitblocks = size/(512*8) + 1;
+  bitblocks = size/(BUF_SIZE*8) + 1;
   usedblocks = ninodes / IPB + 3 + bitblocks;
   freeblock = usedblocks;
 

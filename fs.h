@@ -33,7 +33,7 @@ struct dinode {
   uint size;            // Size of file (bytes)
   
   /* task1 changes, added another pointer entry for the
-   * second level indirection
+   * second level indirection. from +1 to +2
    */
   uint addrs[NDIRECT+1];  // Data block addresses
 };

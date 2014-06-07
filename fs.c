@@ -419,8 +419,8 @@ bmap(struct inode *ip, uint bn)
   // task1 addition
   bn -= NINDIRECT;
   if (bn < NNIINDIRECT){
-    uint lower_bits = bn & 0xF;
-    uint upper_bits = (bn >> 4) & 0xF;
+    uint lower_bits = bn & 0xFF;
+    uint upper_bits = (bn >> 4) & 0xFF;
     if((addr = ip->addrs[NDIRECT+1]) == 0){
       ip->addrs[NDIRECT+1] = addr = balloc(ip->dev);
     }

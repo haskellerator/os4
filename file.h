@@ -23,11 +23,11 @@ struct inode {
   uint size;
 
   /* task1 changes, added another pointer entry for the
-   * second level indirection
+   * second level indirection. from +1 to +2
    */
-
-  uint addrs[NDIRECT+1];
+  uint addrs[NDIRECT+1];  // Data block addresses
 };
+
 #define I_BUSY 0x1
 #define I_VALID 0x2
 
