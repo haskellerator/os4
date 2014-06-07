@@ -19,10 +19,10 @@ struct superblock {
   uint nlog;         // Number of log blocks
 };
 
-#define NDIRECT 12
+#define NDIRECT 11
 #define NINDIRECT (BSIZE / sizeof(uint))
 #define NNIINDIRECT ((BSIZE / sizeof(uint)) * (BSIZE / sizeof(uint))) // task1 changes
-#define MAXFILE (NDIRECT + NINDIRECT)// + NNIINDIRECT)
+#define MAXFILE (NDIRECT + NINDIRECT + NNIINDIRECT) // task1 changes
 
 // On-disk inode structure
 struct dinode {
@@ -35,7 +35,7 @@ struct dinode {
   /* task1 changes, added another pointer entry for the
    * second level indirection. from +1 to +2
    */
-  uint addrs[NDIRECT+1];  // Data block addresses
+  uint addrs[NDIRECT+2];  // Data block addresses
 };
 
 // Inodes per block.

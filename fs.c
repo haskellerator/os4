@@ -404,12 +404,12 @@ bmap(struct inode *ip, uint bn)
   if(bn < NINDIRECT){
     // Load indirect block, allocating if necessary.
     if((addr = ip->addrs[NDIRECT]) == 0){  // addr now holds the address of the block
-      ip->addrs[NDIRECT] = addr = balloc(ip->dev);  // allocates if null
+      ip->addrs[NDIRECT] = addr = balloc(ip->dev);  // allocates root if null
     }
     bp = bread(ip->dev, addr); // returns a buffer 
-    a = (uint*)bp->data;
-    if((addr = a[bn]) == 0){
-      a[bn] = addr = balloc(ip->dev);
+    a = (uint*)bp->data;       // takes its data
+    if((addr = a[bn]) == 0){   // check if in the place it is null
+      a[bn] = addr = balloc(ip->dev); // allocates a leaf
       log_write(bp);
     }
     brelse(bp);
@@ -420,14 +420,14 @@ bmap(struct inode *ip, uint bn)
   bn -= NINDIRECT;
   if (bn < NNIINDIRECT){
     uint lower_bits = bn & 0xFF;
-    uint upper_bits = (bn >> 4) & 0xFF;
+    uint upper_bits = (bn >> 8) & 0xFF;
     if((addr = ip->addrs[NDIRECT+1]) == 0){
-      ip->addrs[NDIRECT+1] = addr = balloc(ip->dev);
+      ip->addrs[NDIRECT+1] = addr = balloc(ip->dev); // allocates root if null
     }
     bp = bread(ip->dev, addr); // reads the block
     a = (uint*)bp->data;
     if((addr = a[upper_bits]) == 0){
-      a[bn] = addr = balloc(ip->dev);
+      a[upper_bits] = addr = balloc(ip->dev);
       log_write(bp);
     } 
     /* until here acts like the conditional above
@@ -446,6 +446,7 @@ bmap(struct inode *ip, uint bn)
 
     brelse(bp2);
     brelse(bp);
+
     return addr;
 
   }

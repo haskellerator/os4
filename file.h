@@ -25,7 +25,7 @@ struct inode {
   /* task1 changes, added another pointer entry for the
    * second level indirection. from +1 to +2
    */
-  uint addrs[NDIRECT+1];  // Data block addresses
+  uint addrs[NDIRECT+2];  // Data block addresses
 };
 
 #define I_BUSY 0x1
