@@ -19,9 +19,11 @@ struct superblock {
   uint nlog;         // Number of log blocks
 };
 
-#define NDIRECT 11
-#define NINDIRECT (BSIZE / sizeof(uint))
-#define NNIINDIRECT ((BSIZE / sizeof(uint)) * (BSIZE / sizeof(uint))) // task1 changes
+#define NDIRECT 12
+// #define NINDIRECT (BSIZE / sizeof(uint))
+// #define NNIINDIRECT ((BSIZE / sizeof(uint)) * (BSIZE / sizeof(uint))) // task1 changes
+#define NINDIRECT 128
+#define NNIINDIRECT 16384 // task1 changes
 #define MAXFILE (NDIRECT + NINDIRECT + NNIINDIRECT) // task1 changes
 
 // On-disk inode structure

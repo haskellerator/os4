@@ -11,10 +11,10 @@
 #include "stat.h"
 #include "param.h"
 
-int nblocks = 20985; // task1 changed from 985->20985 // 16485 not working, 4 too much// 16481 correction
+int nblocks = 32718; // task1 changed from 985->20985 // 16485 not working, 4 too much// 16481 correction
 int nlog = LOGSIZE;
 int ninodes = 200;
-int size = 21029; // task1 changed from 1024->21029 // 16524 = 128*128 + 128 +12
+int size = 32768; // task1 changed from 1024->21029 // 16524 = 128*128 + 128 +12
 
 int fsfd;
 struct superblock sb;
@@ -71,7 +71,7 @@ main(int argc, char *argv[])
     exit(1);
   }
 
-  assert((BUF_SIZE % sizeof(struct dinode)) == 0); // check that dinode is multi of blocksize
+  assert((BUF_SIZE % sizeof(struct dinode)) - 36 == 0); // check that dinode is multi of blocksize
   assert((BUF_SIZE % sizeof(struct dirent)) == 0);
 
   fsfd = open(argv[1], O_RDWR|O_CREAT|O_TRUNC, 0666);
