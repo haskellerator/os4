@@ -71,7 +71,7 @@ main(int argc, char *argv[])
     exit(1);
   }
 
-  assert((BUF_SIZE % sizeof(struct dinode)) - 36 == 0); // check that dinode is multi of blocksize
+  assert((BUF_SIZE % sizeof(struct dinode)) == 0); // check that dinode is multi of blocksize
   assert((BUF_SIZE % sizeof(struct dirent)) == 0);
 
   fsfd = open(argv[1], O_RDWR|O_CREAT|O_TRUNC, 0666);

@@ -38,6 +38,7 @@ struct dinode {
    * second level indirection. from +1 to +2
    */
   uint addrs[NDIRECT+2];  // Data block addresses
+  uint padding[15];
 };
 
 // Inodes per block.

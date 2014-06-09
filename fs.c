@@ -419,8 +419,8 @@ bmap(struct inode *ip, uint bn)
   // task1 addition
   bn -= NINDIRECT;
   if (bn < NNIINDIRECT){
-    uint lower_bits = bn & 0xFF;
-    uint upper_bits = (bn >> 8) & 0xFF;
+    uint lower_bits = bn & 0x7F;
+    uint upper_bits = (bn >> 7) & 0x7F;
     if((addr = ip->addrs[NDIRECT+1]) == 0){
       ip->addrs[NDIRECT+1] = addr = balloc(ip->dev); // allocates root if null
     }
@@ -432,7 +432,6 @@ bmap(struct inode *ip, uint bn)
     } 
     /* until here acts like the conditional above
      * in the way that it searched and allocated layer 1
-
      * now the second level of indirection*/
 
     // a is our block now
@@ -497,13 +496,13 @@ itrunc(struct inode *ip)
         for(i = 0 ; i < NINDIRECT ; i++){
           if(a2[i]){
             bfree(ip->dev, a2[i]);
-            // a2[i] = 0;
+            a2[i] = 0;
           }
         }
 
         brelse(bp2);
         bfree(ip->dev, a[j]);
-        // a[j] = 0;
+        a[j] = 0;
       }
 
     }
