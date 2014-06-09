@@ -20,10 +20,10 @@ struct superblock {
 };
 
 #define NDIRECT 12
-// #define NINDIRECT (BSIZE / sizeof(uint))
-// #define NNIINDIRECT ((BSIZE / sizeof(uint)) * (BSIZE / sizeof(uint))) // task1 changes
-#define NINDIRECT 128
-#define NNIINDIRECT 16384 // task1 changes
+#define NINDIRECT (BSIZE / sizeof(uint))
+#define NNIINDIRECT ((BSIZE / sizeof(uint)) * (BSIZE / sizeof(uint))) // task1 changes
+// #define NINDIRECT 128
+// #define NNIINDIRECT 16384 // task1 changes
 #define MAXFILE (NDIRECT + NINDIRECT + NNIINDIRECT) // task1 changes
 
 // On-disk inode structure
@@ -35,10 +35,10 @@ struct dinode {
   uint size;            // Size of file (bytes)
   
   /* task1 changes, added another pointer entry for the
-   * second level indirection. from +1 to +2
+   * second level indirection. from +1 to +2, and padding
    */
   uint addrs[NDIRECT+2];  // Data block addresses
-  uint padding[15];
+  uint padding[15];  // alignment to 128bytes
 };
 
 // Inodes per block.

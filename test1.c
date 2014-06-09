@@ -9,9 +9,9 @@ main()
   char buf[512];
   int fd, i, sectors;
 
-  fd = open("big.file", O_CREATE | O_WRONLY);
+  fd = open("output1", O_CREATE | O_WRONLY);
   if(fd < 0){
-    printf(2, "big: cannot open big.file for writing\n");
+    printf(2, "test1: cannot open output1 for writing\n");
     exit();
   }
 
@@ -21,29 +21,28 @@ main()
     int cc = write(fd, buf, sizeof(buf));
     if(cc <= 0)
       break;
-    printf(2,"now printed %d\n",sectors);
     sectors++;
-	if (sectors % 100 == 0)
-		printf(2, ".");
+	  if (sectors == 12)
+		  printf(1, "Finished writing 6KB (direct)\n");
+    if (sectors == 140)
+      printf(1, "Finished writing 70KB (single indirect)\n");
+    if (sectors == 2000)
+      printf(1, "Finished writing 1MB\n");
+
+  
   }
-  // int k;
 
-  // for(k = 100 ; sectors % k == 0 && k < 10000000; k = k*10)
-  //   printf(2, ".");
-  // }
-
-  printf(1, "\nwrote %d sectors\n", sectors);
-
+  printf(1, "Finished writing 8MB\n");
   close(fd);
-  fd = open("big.file", O_RDONLY);
+  fd = open("output1", O_RDONLY);
   if(fd < 0){
-    printf(2, "big: cannot re-open big.file for reading\n");
+    printf(2, "test1: cannot re-open output1 for reading\n");
     exit();
   }
   for(i = 0; i < sectors; i++){
     int cc = read(fd, buf, sizeof(buf));
     if(cc <= 0){
-      printf(2, "big: read error at sector %d\n", i);
+      printf(2, "test1: read error at block %d\n", i);
       exit();
     }
     if(*(int*)buf != i){

@@ -354,37 +354,8 @@ iunlockput(struct inode *ip)
 // Return the disk block address of the nth block in inode ip.
 // If there is no such block, bmap allocates one.
 
-// static uint
-// bmap(struct inode *ip, uint bn)
-// {
-//   uint addr, *a;
-//   struct buf *bp;
 
-//   if(bn < NDIRECT){
-//     if((addr = ip->addrs[bn]) == 0)
-//       ip->addrs[bn] = addr = balloc(ip->dev);
-//     return addr;
-//   }
-//   bn -= NDIRECT;
-
-//   if(bn < NINDIRECT){
-//     // Load indirect block, allocating if necessary.
-//     if((addr = ip->addrs[NDIRECT]) == 0)
-//       ip->addrs[NDIRECT] = addr = balloc(ip->dev);
-//     bp = bread(ip->dev, addr);
-//     a = (uint*)bp->data;
-//     if((addr = a[bn]) == 0){
-//       a[bn] = addr = balloc(ip->dev);
-//       log_write(bp);
-//     }
-//     brelse(bp);
-//     return addr;
-//   }
-
-//   panic("bmap: out of range");
-// }
-
-// task1 changes
+// modified as part of task1a
 
 static uint
 bmap(struct inode *ip, uint bn)
@@ -419,8 +390,8 @@ bmap(struct inode *ip, uint bn)
   // task1 addition
   bn -= NINDIRECT;
   if (bn < NNIINDIRECT){
-    uint lower_bits = bn & 0x7F;
-    uint upper_bits = (bn >> 7) & 0x7F;
+    uint lower_bits = bn & 0x7F;  // lower 7 bits of bn
+    uint upper_bits = (bn >> 7) & 0x7F; // upper 7 bits of bn
     if((addr = ip->addrs[NDIRECT+1]) == 0){
       ip->addrs[NDIRECT+1] = addr = balloc(ip->dev); // allocates root if null
     }
@@ -431,15 +402,15 @@ bmap(struct inode *ip, uint bn)
       log_write(bp);
     } 
     /* until here acts like the conditional above
-     * in the way that it searched and allocated layer 1
-     * now the second level of indirection*/
+     * in the way that it searched and allocated layer 1.
+     * now entering the second level of indirection*/
 
     // a is our block now
 
     bp2 = bread(ip->dev,addr);
     a2 = (uint*)bp2->data;
     if((addr = a2[lower_bits]) == 0){
-      a2[lower_bits] = addr = balloc(ip->dev);
+      a2[lower_bits] = addr = balloc(ip->dev);  // allocates leaf
       log_write(bp2);
     }
 
@@ -483,7 +454,8 @@ itrunc(struct inode *ip)
     ip->addrs[NDIRECT] = 0;
   }
 
-  // task1 addition
+  /* task1 addition
+   * iteration on the 2 level indirection tree*/
 
   if(ip->addrs[NDIRECT+1]){
     bp = bread(ip->dev, ip->addrs[NDIRECT+1]);
@@ -496,13 +468,11 @@ itrunc(struct inode *ip)
         for(i = 0 ; i < NINDIRECT ; i++){
           if(a2[i]){
             bfree(ip->dev, a2[i]);
-            a2[i] = 0;
           }
         }
 
         brelse(bp2);
         bfree(ip->dev, a[j]);
-        a[j] = 0;
       }
 
     }

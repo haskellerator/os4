@@ -11,10 +11,10 @@
 #include "stat.h"
 #include "param.h"
 
-int nblocks = 32718; // task1 changed from 985->20985 // 16485 not working, 4 too much// 16481 correction
+int nblocks = 32696; // task1 changes
 int nlog = LOGSIZE;
 int ninodes = 200;
-int size = 32768; // task1 changed from 1024->21029 // 16524 = 128*128 + 128 +12
+int size = 32768; // task1 changes
 
 int fsfd;
 struct superblock sb;
