@@ -6,7 +6,7 @@
 int
 main()
 {
-	symlink();
-	readlink();
+	symlink("hahaha","blabla");
+	readlink("what","the", 82);
 	exit();
 }

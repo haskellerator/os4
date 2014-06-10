@@ -90,16 +90,3 @@ sys_uptime(void)
 }
 
 
-int 
-sys_symlink(void)
-{
-  cprintf("here syslink\n");
-  return 0;
-}
-
-int 
-sys_readlink(void)
-{
-  cprintf("here readlink\n");
-  return 0;
-}

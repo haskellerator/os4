@@ -423,3 +423,30 @@ sys_pipe(void)
   fd[1] = fd1;
   return 0;
 }
+
+//task1b addition
+
+int 
+sys_symlink(void) // const char* ,const char*
+{
+  char *oldpath, *newpath;
+
+  if(argstr(0, &oldpath) < 0 || argstr(1, &newpath) < 0){
+    return -1;
+  }
+
+  cprintf("here syslink: %s %s\n", oldpath, newpath);
+  return 0;
+}
+
+int 
+sys_readlink(void) // const char* , char*, size_t (uint)
+{
+  char *pathname, *buf;
+  int bufsiz;
+
+  if(argstr(0, &pathname) < 0 || argint(2, &bufsiz) < 0 || argptr(1, &buf,bufsiz) < 0) // needs bufsize for buf
+    return -1;
+  cprintf("here readlink: %s %s %d\n");
+  return 0;
+}
