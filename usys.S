@@ -29,3 +29,7 @@ SYSCALL(getpid)
 SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
+
+#task1 addition
+SYSCALL(symlink)
+SYSCALL(readlink)

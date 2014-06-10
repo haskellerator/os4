@@ -23,6 +23,10 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 
+// task1 addition
+int symlink(void);
+int readlink(void);
+
 // ulib.c
 int stat(char*, struct stat*);
 char* strcpy(char*, char*);

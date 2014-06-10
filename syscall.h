@@ -21,3 +21,7 @@
 #define SYS_link   19
 #define SYS_mkdir  20
 #define SYS_close  21
+
+// task1 addition
+#define SYS_symlink 22
+#define SYS_readlink 23
