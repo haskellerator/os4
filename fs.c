@@ -275,8 +275,11 @@ ilock(struct inode *ip)
     panic("ilock");
 
   acquire(&icache.lock);
-  while(ip->flags & I_BUSY)
+  while(ip->flags & I_BUSY){
+    // cprintf("sleeping\n");
     sleep(ip, &icache.lock);
+  }
+  // cprintf("done\n");
   ip->flags |= I_BUSY;
   release(&icache.lock);
 

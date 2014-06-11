@@ -444,9 +444,9 @@ sys_symlink(void) // const char* ,const char*
     return -2; // inode creation failed
   }
 
-  ilock(ip);
-  // then holds the pointer to old path
-  writei(ip,oldpath,0,strlen(oldpath));
+  // ilock(ip);
+  // // then holds the pointer to old path
+    writei(ip,oldpath,0,strlen(oldpath)); 
   iunlock(ip);
   iput(ip);
 
@@ -463,6 +463,6 @@ sys_readlink(void) // const char* , char*, size_t (uint)
 
   if(argstr(0, &pathname) < 0 || argstr(1, &buf) < 0 || argint(2, &bufsiz) < 0) 
     return -1;
-  cprintf("here readlink: %s %s %d\n",pathname,buf,bufsiz);
+  cprintf("here readlink: %s %s\n",pathname,buf);
   return 0;
 }
