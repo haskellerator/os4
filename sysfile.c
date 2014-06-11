@@ -445,8 +445,8 @@ sys_readlink(void) // const char* , char*, size_t (uint)
   char *pathname, *buf;
   int bufsiz;
 
-  if(argstr(0, &pathname) < 0 || argint(2, &bufsiz) < 0 || argptr(1, &buf,bufsiz) < 0) // needs bufsize for buf
+  if(argstr(0, &pathname) < 0 || argstr(1, &buf) < 0 || argint(2, &bufsiz) < 0) /
     return -1;
-  cprintf("here readlink: %s %s %d\n");
+  cprintf("here readlink: %s %s %d\n",pathname,buf,bufsiz);
   return 0;
 }
