@@ -467,10 +467,16 @@ int
 sys_readlink(void) // const char* , char*, size_t (uint)
 {
   char *pathname, *buf;
-  int bufsiz;
-
-  if(argstr(0, &pathname) < 0 || argstr(1, &buf) < 0 || argint(2, &bufsiz) < 0) 
+  int bufsiz, n;
+  struct inode * ip;
+  
+  if(argstr(0, &pathname) < 0 || argstr(1, &buf) < 0 || argint(2, &bufsiz) < 0 || (ip = namei_sym(pathname,1)) == 0 || ip->type != T_SYMLINK) {
+    // cprintf("error: path %s, buf %s, bufsiz %d type %d, ip %p",pathname,buf,bufsiz,ip->type,ip);
     return -1;
-  cprintf("here readlink: %s %s %d\n",pathname,buf,bufsiz);
-  return 0;
+  }
+
+  if((n = readi(ip,buf,0,ip->size)) < 0)
+    return -1;
+
+  return n;
 }
