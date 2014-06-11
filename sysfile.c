@@ -446,11 +446,14 @@ sys_symlink(void) // const char* ,const char*
 
   // ilock(ip);
   // // then holds the pointer to old path
-    writei(ip,oldpath,0,strlen(oldpath)); 
-  iunlock(ip);
+  writei(ip,oldpath,0,strlen(oldpath)); 
+
+  // ip->type = T_SYMLINK;
+  // these functions purpose is to change the inode bit flags, so that it will be released for use
+  iunlockput(ip);  
   iput(ip);
 
-  cprintf("here syslink: %s %s %d\n", oldpath, newpath,ip->type);
+  cprintf("here syslink: %s %s %d %d\n", oldpath, newpath,ip->inum,ip->type);
   commit_trans();
   return 0;
 }
@@ -463,6 +466,6 @@ sys_readlink(void) // const char* , char*, size_t (uint)
 
   if(argstr(0, &pathname) < 0 || argstr(1, &buf) < 0 || argint(2, &bufsiz) < 0) 
     return -1;
-  cprintf("here readlink: %s %s\n",pathname,buf);
+  cprintf("here readlink: %s %s %d\n",pathname,buf,bufsiz);
   return 0;
 }

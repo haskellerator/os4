@@ -675,6 +675,7 @@ static struct inode*
 namex(char *path, int nameiparent, char *name)
 {
   struct inode *ip, *next;
+  char buf[128], name2[DIRSIZ];
 
   if(*path == '/')
     ip = iget(ROOTDEV, ROOTINO);
@@ -696,13 +697,36 @@ namex(char *path, int nameiparent, char *name)
       iunlockput(ip);
       return 0;
     }
-    iunlockput(ip);
+    // iunlockput(ip);
+    iunlock(ip);
+    ilock(next);
+    // cprintf("inside namex!!!!!!!!!!!! %d\n",next->type);
+    if(next->type == T_SYMLINK){
+      
+      // open file and reads its contents
+      if(readi(next,buf,0,next->size) != next->size){// || sizeof(buf) != next->size){ // if read fails
+        // cprintf("buf: %d %d%s",test,sizeof(buf),buf);
+        iunlockput(next); 
+        iput(ip);
+        return 0;
+      }  
+      buf[next->size] = 0; // null terminates string
+      iunlockput(next);
+      next = namex(buf,0,name2);
+      // cprintf("read: %s\n",buf);
+      //send to namex
+    }else{
+      iunlock(next);
+    }
+    iput(ip);
     ip = next;
   }
+
   if(nameiparent){
     iput(ip);
     return 0;
   }
+
   return ip;
 }
 

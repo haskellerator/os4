@@ -6,7 +6,7 @@
 int
 main()
 {
-	symlink("/mkdir","blabla");
+	symlink("/ls","blabla");
 	readlink("what","the", 82);
 	exit();
 }
