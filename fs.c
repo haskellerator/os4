@@ -672,7 +672,7 @@ skipelem(char *path, char *name)
 // If parent != 0, return the inode for the parent and copy the final
 // path element into name, which must have room for DIRSIZ bytes.
 static struct inode*
-namex(char *path, int nameiparent, char *name)
+namex(char *path, int nameiparent, char *name, int ignorelink)
 {
   struct inode *ip, *next;
   char buf[128], name2[DIRSIZ]; // changes for task1b
@@ -705,7 +705,7 @@ namex(char *path, int nameiparent, char *name)
     ilock(next);
     // cprintf("inside namex!!!!!!!!!!!! %d\n",next->type);
 
-    if(next->type == T_SYMLINK){ // if next file is of symlink type
+    if(next->type == T_SYMLINK && !ignorelink){ // if next file is of symlink type
       // open file and reads its contents
       if(readi(next,buf,0,next->size) != next->size){ 
         // if read fails
@@ -722,7 +722,7 @@ namex(char *path, int nameiparent, char *name)
        * the file which is written on the inode 
        */
       
-      next = namex(buf,0,name2); 
+      next = namex(buf,0,name2, ignorelink); 
       // cprintf("read: %s\n",buf);
     }else{
       iunlock(next);
@@ -743,11 +743,18 @@ struct inode*
 namei(char *path)
 {
   char name[DIRSIZ];
-  return namex(path, 0, name);
+  return namex(path, 0, name, 0);
+}
+
+struct inode*
+namei_sym(char *path, int ignorelink)
+{
+  char name[DIRSIZ];
+  return namex(path, 0, name, ignorelink);
 }
 
 struct inode*
 nameiparent(char *path, char *name)
 {
-  return namex(path, 1, name);
+  return namex(path, 1, name, 0);
 }
