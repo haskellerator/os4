@@ -111,7 +111,7 @@ sys_fstat(void)
   return filestat(f, st);
 }
 
-// Create the path new as a link to the same inode as old.
+// Creat-e the path new as a link to the same inode as old.
 int
 sys_link(void)
 {
@@ -430,12 +430,28 @@ int
 sys_symlink(void) // const char* ,const char*
 {
   char *oldpath, *newpath;
+  struct inode *ip;
+
 
   if(argstr(0, &oldpath) < 0 || argstr(1, &newpath) < 0){
-    return -1;
+    return -1; // arg fetch failed
   }
 
-  cprintf("here syslink: %s %s\n", oldpath, newpath);
+  begin_trans();
+  // creates new inode, whose name is new path
+  if((ip = create(newpath,T_SYMLINK,0,0)) == 0){
+    commit_trans();
+    return -2; // inode creation failed
+  }
+
+  ilock(ip);
+  // then holds the pointer to old path
+  writei(ip,oldpath,0,strlen(oldpath));
+  iunlock(ip);
+  iput(ip);
+
+  cprintf("here syslink: %s %s %d\n", oldpath, newpath,ip->type);
+  commit_trans();
   return 0;
 }
 
@@ -445,7 +461,7 @@ sys_readlink(void) // const char* , char*, size_t (uint)
   char *pathname, *buf;
   int bufsiz;
 
-  if(argstr(0, &pathname) < 0 || argstr(1, &buf) < 0 || argint(2, &bufsiz) < 0) /
+  if(argstr(0, &pathname) < 0 || argstr(1, &buf) < 0 || argint(2, &bufsiz) < 0) 
     return -1;
   cprintf("here readlink: %s %s %d\n",pathname,buf,bufsiz);
   return 0;
