@@ -2,6 +2,8 @@
 #include "stat.h"
 #include "user.h"
 #include "fs.h"
+#include "fcntl.h"
+
 
 char*
 fmtname(char *path)
@@ -30,7 +32,7 @@ ls(char *path)
   struct dirent de;
   struct stat st;
   
-  if((fd = open(path, 0)) < 0){
+  if((fd = open(path, O_NOREF)) < 0){
     printf(2, "ls: cannot open %s\n", path);
     return;
   }
@@ -59,7 +61,7 @@ ls(char *path)
         continue;
       memmove(p, de.name, DIRSIZ);
       p[DIRSIZ] = 0;
-      if(stat(buf, &st) < 0){
+      if(stat2(buf, &st) < 0){
         printf(1, "ls: cannot stat %s\n", buf);
         continue;
       }

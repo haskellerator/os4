@@ -29,6 +29,7 @@ int readlink(const char*, char *,size_t);
 
 // ulib.c
 int stat(char*, struct stat*);
+int stat2(char*, struct stat*);
 char* strcpy(char*, char*);
 void *memmove(void*, void*, int);
 char* strchr(const char*, char c);

@@ -82,6 +82,21 @@ stat(char *n, struct stat *st)
 }
 
 int
+stat2(char *n, struct stat *st)
+{
+  int fd;
+  int r;
+
+  fd = open(n, O_RDONLY | O_NOREF);
+  if(fd < 0)
+    return -1;
+  r = fstat(fd, st);
+  close(fd);
+  return r;
+}
+
+
+int
 atoi(const char *s)
 {
   int n;

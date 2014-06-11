@@ -750,6 +750,7 @@ struct inode*
 namei_sym(char *path, int ignorelink)
 {
   char name[DIRSIZ];
+  // cprintf("been here in namei_sym %d\n", ignorelink);
   return namex(path, 0, name, ignorelink);
 }
 
