@@ -469,14 +469,13 @@ sys_readlink(void) // const char* , char*, size_t (uint)
   char *pathname, *buf;
   int bufsiz, n;
   struct inode *ip, *next;
-  cprintf("hey you ");
   if(argstr(0, &pathname) < 0 || argstr(1, &buf) < 0 || argint(2, &bufsiz) < 0 || (ip = namei_sym(pathname,1)) == 0 || ip->type != T_SYMLINK) {
     // cprintf("error: path %s, buf %s, bufsiz %d type %d, ip %p",pathname,buf,bufsiz,ip->type,ip);
     return -1;
   }
-  //temp char[bufsiz];
+  
   while((n = readi(ip,buf,0,ip->size)) >= 0 && ip->type == T_SYMLINK){
-    memset(&buf,0,bufsiz);
+    buf[ip->size] = '\0';
     if((next = namei_sym(buf,1)) == 0 || n <= 0){
       return -2;
     } else if( next->type != T_SYMLINK){
