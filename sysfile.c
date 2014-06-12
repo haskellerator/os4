@@ -515,7 +515,6 @@ int sys_fprot() {
   if ((ip = namei(pathname)) < 0) {
     return -2;
   }
-
   // Lock the inode
   ilock(ip);
   // Test if the inode is already open or has a set password (already protected)
@@ -523,7 +522,6 @@ int sys_fprot() {
     iunlock(ip);
     return -3;
   }
-
   // Set the password, unlock the file and update the disk copy
   memmove(ip->password, password, sizeof(password));
   iunlock(ip);
@@ -537,7 +535,21 @@ int sys_funprot() {
   if (argstr(0, &pathname) < 0 || argstr(1, &password) < 0){
     return -1;
   }
-  cprintf("sys_funprot: path: %s, pass: %s\n",pathname,password);
+  //cprintf("sys_funprot: path: %s, pass: %s\n",pathname,password);
+  if ((ip = namei(pathname)) < 0) {
+    return -2;
+  }
+  // Lock the inode
+  ilock(ip);
+  // Test if the passwords are equal. Fail if not.  
+  if (strcmp(password, ip->password) != 0) {
+    iunlock(ip);
+    return -3;
+  }
+  // Reset the password, unlock the file and update the disk copy
+  memset(ip->password, 0, sizeof(ip->password));
+  iunlock(ip);
+  iput(ip);
 
   return 0;
 }
