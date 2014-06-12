@@ -518,7 +518,6 @@ int sys_fprot() {
 
   // Lock the inode
   ilock(ip);
-
   // Test if the inode is already open or has a set password (already protected)
   if (check_inode(ip) < 0 || ip->password[0] != 0) {
     iunlock(ip);
