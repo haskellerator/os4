@@ -482,6 +482,7 @@ sys_readlink(void) // const char* , char*, size_t (uint)
   /* this loop reads the ip contents, if they point to another symbolic link (next),
    * then next is promoted to be new ip. otherwise (next type is not symbolic link)
    * buf is returned (cuz contains non symbolic link which is legal) */
+   
   while((n = readi(ip,buf,0,ip->size)) >= 0 && ip->type == T_SYMLINK && loop--){
     buf[ip->size] = '\0'; // null terminates string
     
@@ -495,4 +496,35 @@ sys_readlink(void) // const char* , char*, size_t (uint)
   }
 
   return n;
+}
+
+// task2 additions. args for all of them: (const char *pathname, const char *password)
+
+int sys_fprot (){
+  char *pathname, *password;
+  if (argstr(0, &pathname) < 0 || argstr(1, &password) < 0){
+    return -1;
+  }
+  cprintf("sys_fprot: path: %s, pass: %s\n",pathname,password);
+  
+  return 0;
+}
+
+int sys_funprot(){
+  char *pathname, *password;
+  if (argstr(0, &pathname) < 0 || argstr(1, &password) < 0){
+    return -1;
+  }
+  cprintf("sys_funprot: path: %s, pass: %s\n",pathname,password);
+
+  return 0;
+}
+
+int sys_funlock(){
+  char *pathname, *password;
+  if (argstr(0, &pathname) < 0 || argstr(1, &password) < 0){
+    return -1;
+  }
+  cprintf("sys_funlock: path: %s, pass: %s\n",pathname,password);
+  return 0;
 }

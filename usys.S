@@ -33,3 +33,8 @@ SYSCALL(uptime)
 #task1 addition
 SYSCALL(symlink)
 SYSCALL(readlink)
+
+#task2 addition
+SYSCALL(fprot)
+SYSCALL(funprot)
+SYSCALL(funlock)

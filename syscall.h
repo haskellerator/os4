@@ -25,3 +25,8 @@
 // task1 addition
 #define SYS_symlink 22
 #define SYS_readlink 23
+
+// task2 addition
+#define SYS_fprot 24
+#define SYS_funprot 25
+#define SYS_funlock 26

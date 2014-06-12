@@ -103,6 +103,11 @@ extern int sys_uptime(void);
 extern int sys_symlink(void);
 extern int sys_readlink(void);
 
+// task2 addition
+extern int sys_fprot(void);
+extern int sys_funprot(void);
+extern int sys_funlock(void);
+
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
 [SYS_exit]    sys_exit,
@@ -129,6 +134,12 @@ static int (*syscalls[])(void) = {
 // task1 addition
 [SYS_symlink] sys_symlink,
 [SYS_readlink] sys_readlink,
+
+// task2 addition
+[SYS_fprot]   sys_fprot,
+[SYS_funprot] sys_funprot,
+[SYS_funlock] sys_funlock,
+
 };
 
 void
