@@ -5,15 +5,15 @@
 
 #define BUF_SIZE 128
 
-char buf2[512];
 
 void
 cat(int fd)
 {
+  char buf[BUF_SIZE];
   int n;
 
-  while((n = read(fd, buf2, sizeof(buf2))) > 0)
-    write(1, buf2, n);
+  while((n = read(fd, buf, sizeof(buf))) > 0)
+    write(1, buf, n);
   if(n < 0){
     printf(1, "cat: read error\n");
     exit();
@@ -101,7 +101,7 @@ main(int argc, char *argv[])
 		cat(fd); // supposed to succeed
 	}
 	
-	printf(1,"Test ended"); 
+	printf(1,"Test Passed\n"); 
 	exit();
 }
 

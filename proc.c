@@ -153,7 +153,7 @@ fork(void)
   for(i = 0; i < NOFILE; i++)
     if(proc->ofile[i]) {
       np->ofile[i] = filedup(proc->ofile[i]);
-      clone_unlocked(proc->ofile[i], proc->pid, np->pid);
+      clone_unlocked(proc->ofile[i], proc->pid, np->pid); // task 2
     }
   np->cwd = idup(proc->cwd);
  
