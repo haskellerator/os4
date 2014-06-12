@@ -151,8 +151,10 @@ fork(void)
   np->tf->eax = 0;
 
   for(i = 0; i < NOFILE; i++)
-    if(proc->ofile[i])
+    if(proc->ofile[i]) {
       np->ofile[i] = filedup(proc->ofile[i]);
+      clone_unlocked(proc->ofile[i], proc->pid, np->pid);
+    }
   np->cwd = idup(proc->cwd);
  
   pid = np->pid;

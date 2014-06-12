@@ -153,6 +153,8 @@ void            syscall(void);
 // sysfile.c
 // task 2
 int 			check_inode(struct inode*);
+void 			clone_unlocked(struct file*, int, int);
+
 
 // timer.c
 void            timerinit(void);

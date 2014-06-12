@@ -543,7 +543,7 @@ int sys_funprot() {
   // Lock the inode
   ilock(ip);
   // Test if the passwords are equal. Fail if not.  
-  if (strncmp(password, ip->password, strlen(password) != 0) {
+  if (strncmp(password, ip->password, strlen(password)) != 0) {
     iunlock(ip);
     return -3;
   }

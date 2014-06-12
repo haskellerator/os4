@@ -161,3 +161,12 @@ int test_file_inode(struct file *f, struct inode *ip){
   }
   return -1;
 }
+
+void clone_unlocked(struct file *f, int oldpid, int newpid) {
+  uint oldbit = 1 << oldpid;
+  uint newbit = 1 << newpid;
+
+  if (f->ip->unlocked & oldbit) {
+    f->ip->unlocked |= newbit;
+  }
+}
