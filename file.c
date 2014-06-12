@@ -8,6 +8,7 @@
 #include "fs.h"
 #include "file.h"
 #include "spinlock.h"
+#include "stat.h"
 
 struct devsw devsw[NDEV];
 struct {
@@ -154,3 +155,9 @@ filewrite(struct file *f, char *addr, int n)
   panic("filewrite");
 }
 
+int test_file_inode(struct file *f, struct inode *ip){
+  if(f->ref > 0 && f->ip->type == T_FILE && f->ip == ip){
+    return 1;
+  }
+  return -1;
+}

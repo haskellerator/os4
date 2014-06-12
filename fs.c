@@ -294,6 +294,7 @@ ilock(struct inode *ip)
     ip->nlink = dip->nlink;
     ip->size = dip->size;
     memmove(ip->addrs, dip->addrs, sizeof(ip->addrs));
+    memmove(ip->password, dip->password, sizeof(dip->password));
     brelse(bp);
     ip->flags |= I_VALID;
     if(ip->type == 0)

@@ -500,17 +500,40 @@ sys_readlink(void) // const char* , char*, size_t (uint)
 
 // task2 additions. args for all of them: (const char *pathname, const char *password)
 
-int sys_fprot (){
+int sys_fprot() {
   char *pathname, *password;
+  struct inode *ip;
   if (argstr(0, &pathname) < 0 || argstr(1, &password) < 0){
     return -1;
   }
-  cprintf("sys_fprot: path: %s, pass: %s\n",pathname,password);
-  
+  if (strlen(password) == 0) {
+    cprintf("Error, password cannot be empty.\n");
+    return -1;
+  }
+
+  //cprintf("sys_fprot: path: %s, pass: %s\n",pathname,password);
+  if ((ip = namei(pathname)) < 0) {
+    return -2;
+  }
+
+  // Lock the inode
+  ilock(ip);
+
+  // Test if the inode is already open or has a set password (already protected)
+  if (check_inode(ip) < 0 || ip->password[0] != 0) {
+    iunlock(ip);
+    return -3;
+  }
+
+  // Set the password, unlock the file and update the disk copy
+  memmove(ip->password, password, sizeof(password));
+  iunlock(ip);
+  iput(ip);
+
   return 0;
 }
 
-int sys_funprot(){
+int sys_funprot() {
   char *pathname, *password;
   if (argstr(0, &pathname) < 0 || argstr(1, &password) < 0){
     return -1;
@@ -520,7 +543,7 @@ int sys_funprot(){
   return 0;
 }
 
-int sys_funlock(){
+int sys_funlock() {
   char *pathname, *password;
   if (argstr(0, &pathname) < 0 || argstr(1, &password) < 0){
     return -1;

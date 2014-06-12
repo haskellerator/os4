@@ -31,6 +31,7 @@ void            fileinit(void);
 int             fileread(struct file*, char*, int n);
 int             filestat(struct file*, struct stat*);
 int             filewrite(struct file*, char*, int n);
+int 			test_file_inode(struct file*, struct inode*);
 
 // fs.c
 void            readsb(int dev, struct superblock *sb);
@@ -118,6 +119,8 @@ int             wait(void);
 void            wakeup(void*);
 void            yield(void);
 
+
+
 // swtch.S
 void            swtch(struct context**, struct context*);
 
@@ -146,6 +149,10 @@ int             argstr(int, char**);
 int             fetchint(struct proc*, uint, int*);
 int             fetchstr(struct proc*, uint, char**);
 void            syscall(void);
+
+// sysfile.c
+// task 2
+int 			check_inode(struct inode*);
 
 // timer.c
 void            timerinit(void);
