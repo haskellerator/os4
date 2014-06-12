@@ -1,3 +1,4 @@
+
 struct file {
   enum { FD_NONE, FD_PIPE, FD_INODE,FD_SYMLINK } type;
   int ref; // reference count
@@ -26,10 +27,15 @@ struct inode {
    * second level indirection. from +1 to +2
    */
   uint addrs[NDIRECT+2];  // Data block addresses
+
+  char password[10];  // inode password, task 2
 };
 
 #define I_BUSY 0x1
 #define I_VALID 0x2
+
+// Task 2
+#define I_PROT 0x4
 
 // table mapping major device number to
 // device functions

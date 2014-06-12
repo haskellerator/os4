@@ -38,7 +38,9 @@ struct dinode {
    * second level indirection. from +1 to +2, and padding
    */
   uint addrs[NDIRECT+2];  // Data block addresses
-  uint padding[15];  // alignment to 128bytes
+  char password[10];      // inode password, task 2
+
+  char padding[50];  // alignment to 128bytes
 };
 
 // Inodes per block.
