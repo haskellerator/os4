@@ -23,9 +23,10 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 
+
 // task1 addition
-int symlink(const char*, const char*);
-int readlink(const char*, char *,size_t);
+int symlink(char*, char*);
+int readlink(char*, char *,size_t);
 
 // ulib.c
 int stat(char*, struct stat*);
