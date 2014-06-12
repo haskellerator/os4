@@ -20,6 +20,7 @@
 #include "fs.h"
 #include "file.h"
 
+#define LOOP_NUM  16
 #define min(a, b) ((a) < (b) ? (a) : (b))
 static void itrunc(struct inode*);
 
@@ -672,10 +673,11 @@ skipelem(char *path, char *name)
 // If parent != 0, return the inode for the parent and copy the final
 // path element into name, which must have room for DIRSIZ bytes.
 static struct inode*
-namex(char *path, int nameiparent, char *name, int ignorelink)
+namex(char *path, int nameiparent, char *name, int ignorelink, uint loops)
 {
   struct inode *ip, *next;
   char buf[128], name2[DIRSIZ]; // changes for task1b
+
 
   if(*path == '/')
     ip = iget(ROOTDEV, ROOTINO);
@@ -722,7 +724,12 @@ namex(char *path, int nameiparent, char *name, int ignorelink)
        * the file which is written on the inode 
        */
       
-      next = namex(buf,0,name2, ignorelink); 
+      if(loops == 0){ // avoid infinite
+          cprintf("Error: infinite loop\n"); //TODO: maybe replace with panic
+          iput(ip);
+          break;
+      }
+      next = namex(buf,0,name2, ignorelink, loops-1); 
       // cprintf("read: %s\n",buf);
     }else{
       iunlock(next);
@@ -743,7 +750,7 @@ struct inode*
 namei(char *path)
 {
   char name[DIRSIZ];
-  return namex(path, 0, name, 0);
+  return namex(path, 0, name, 0, LOOP_NUM);
 }
 
 struct inode*
@@ -751,11 +758,11 @@ namei_sym(char *path, int ignorelink)
 {
   char name[DIRSIZ];
   // cprintf("been here in namei_sym %d\n", ignorelink);
-  return namex(path, 0, name, ignorelink);
+  return namex(path, 0, name, ignorelink, LOOP_NUM);
 }
 
 struct inode*
 nameiparent(char *path, char *name)
 {
-  return namex(path, 1, name, 0);
+  return namex(path, 1, name, 0, LOOP_NUM);
 }

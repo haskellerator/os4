@@ -463,6 +463,10 @@ sys_symlink(void) // const char* ,const char*
   return 0;
 }
 
+
+#define LOOP_NUM 16
+
+// TODO maybe integerate it to the namex
 int 
 sys_readlink(void) // const char* , char*, size_t (uint)
 {
@@ -473,9 +477,11 @@ sys_readlink(void) // const char* , char*, size_t (uint)
     // cprintf("error: path %s, buf %s, bufsiz %d type %d, ip %p",pathname,buf,bufsiz,ip->type,ip);
     return -1;
   }
-  
-  while((n = readi(ip,buf,0,ip->size)) >= 0 && ip->type == T_SYMLINK){
+
+  int loop = LOOP_NUM;
+  while((n = readi(ip,buf,0,ip->size)) >= 0 && ip->type == T_SYMLINK && loop--){
     buf[ip->size] = '\0';
+    cprintf("here readlink %d %s\n",loop,buf);
     if((next = namei_sym(buf,1)) == 0 || n <= 0){
       return -2;
     } else if( next->type != T_SYMLINK){
