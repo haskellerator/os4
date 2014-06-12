@@ -532,6 +532,7 @@ int sys_fprot() {
 
 int sys_funprot() {
   char *pathname, *password;
+  struct inode *ip;
   if (argstr(0, &pathname) < 0 || argstr(1, &password) < 0){
     return -1;
   }
@@ -542,7 +543,7 @@ int sys_funprot() {
   // Lock the inode
   ilock(ip);
   // Test if the passwords are equal. Fail if not.  
-  if (strcmp(password, ip->password) != 0) {
+  if (strncmp(password, ip->password, strlen(password) != 0) {
     iunlock(ip);
     return -3;
   }

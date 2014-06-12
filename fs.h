@@ -39,8 +39,9 @@ struct dinode {
    */
   uint addrs[NDIRECT+2];  // Data block addresses
   char password[10];      // inode password, task 2
+  uint unlocked;          // which processes have unlocked the file
 
-  char padding[50];  // alignment to 128bytes
+  char padding[42];  // alignment to 128bytes
 };
 
 // Inodes per block.
