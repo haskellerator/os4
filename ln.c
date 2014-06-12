@@ -14,7 +14,7 @@ main(int argc, char *argv[])
 	argv++;
 	}
 	if(argc != 3){
-		printf(2, "usage: ln [-s] old new (%d)\n", argc);
+		printf(2, "usage: ln [-s] old new\n");
 		exit();
 	}
 	if(ln(argv[1], argv[2]) < 0){
