@@ -474,19 +474,22 @@ sys_readlink(void) // const char* , char*, size_t (uint)
   int bufsiz, n;
   struct inode *ip, *next;
   if(argstr(0, &pathname) < 0 || argstr(1, &buf) < 0 || argint(2, &bufsiz) < 0 || (ip = namei_sym(pathname,1)) == 0 || ip->type != T_SYMLINK) {
-    // cprintf("error: path %s, buf %s, bufsiz %d type %d, ip %p",pathname,buf,bufsiz,ip->type,ip);
     return -1;
   }
 
-  int loop = LOOP_NUM;
+  int loop = LOOP_NUM; // loops arg, to avoid infinite loops
+
+  /* this loop reads the ip contents, if they point to another symbolic link (next),
+   * then next is promoted to be new ip. otherwise (next type is not symbolic link)
+   * buf is returned (cuz contains non symbolic link which is legal) */
   while((n = readi(ip,buf,0,ip->size)) >= 0 && ip->type == T_SYMLINK && loop--){
-    buf[ip->size] = '\0';
-    // cprintf("here readlink %d %s\n",loop,buf);
-    if((next = namei_sym(buf,1)) == 0 || n <= 0){
-      return -2;
-    } else if(next->type != T_SYMLINK){
+    buf[ip->size] = '\0'; // null terminates string
+    
+    if(n <= 0 || (next = namei_sym(buf,1)) == 0){ // checks that read was done properly and then fetches inode
+      return -1; // if conditions not met, exit
+    } else if(next->type != T_SYMLINK){  // next type is not symbolic, so we return
       return n;
-    } else{
+    } else{  // moves to the next level in the chain
       ip = next;
     }
   }
