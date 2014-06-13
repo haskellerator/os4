@@ -24,6 +24,12 @@ exec(char *path, char **argv)
   ilock(ip);
   pgdir = 0;
 
+  // task 2
+  if (is_protected(ip)) {
+    cprintf("File is password protected!\n");
+    goto bad;
+  }
+
   // Check ELF header
   if(readi(ip, (char*)&elf, 0, sizeof(elf)) < sizeof(elf))
     goto bad;

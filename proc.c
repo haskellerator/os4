@@ -70,6 +70,8 @@ found:
   p->context = (struct context*)sp;
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
+  // task 2
+  memset(p->unlocked, 0, sizeof(p->unlocked));
 
   return p;
 }
@@ -153,10 +155,12 @@ fork(void)
   for(i = 0; i < NOFILE; i++)
     if(proc->ofile[i]) {
       np->ofile[i] = filedup(proc->ofile[i]);
-      clone_unlocked(proc->ofile[i], proc->pid, np->pid); // task 2
     }
   np->cwd = idup(proc->cwd);
  
+  // task 2
+  memmove(np->unlocked, proc->unlocked, sizeof(proc->unlocked));
+  
   pid = np->pid;
   np->state = RUNNABLE;
   safestrcpy(np->name, proc->name, sizeof(proc->name));

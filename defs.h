@@ -32,10 +32,7 @@ int             fileread(struct file*, char*, int n);
 int             filestat(struct file*, struct stat*);
 int             filewrite(struct file*, char*, int n);
 int 			test_file_inode(struct file*, struct inode*);
-void 			clone_unlocked(struct file *, int, int);
-void 			add_unlocked(struct file *, int);
-void 			clear_unlocked(struct file *, int);
-
+int 			is_protected(struct inode*);
 
 // fs.c
 void            readsb(int dev, struct superblock *sb);

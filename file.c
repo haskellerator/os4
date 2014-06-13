@@ -163,26 +163,6 @@ int test_file_inode(struct file *f, struct inode *ip){
   return -1;
 }
 
-// Adds the new pid bit to the unlocked processes field if the old pid bit was on
-void clone_unlocked(struct file *f, int oldpid, int newpid) {
-  uint oldbit = 1 << oldpid;
-  uint newbit = 1 << newpid;
-
-  if (f->ip->unlocked & oldbit) {
-    f->ip->unlocked |= newbit;
-  }
-}
-
-// Adds the given pid's bit from the file's unlocked field
-void add_unlocked(struct file *f, int pid) {
-  uint pidbit = 1 << pid;
-
-  f->ip->unlocked |= pidbit;
-}
-
-// Removes the given pid's bit from the file's unlocked field
-void clear_unlocked(struct file *f, int pid) {
-  uint pidbit = 1 << pid;
-
-  f->ip->unlocked &= ~pidbit;
+int is_protected(struct inode *ip) {
+  return ip->password[0] != 0;
 }
