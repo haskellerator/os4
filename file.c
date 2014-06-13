@@ -155,6 +155,7 @@ filewrite(struct file *f, char *addr, int n)
   panic("filewrite");
 }
 
+// Tests if the file has references, is of type file and is the same inode as the given inode
 int test_file_inode(struct file *f, struct inode *ip){
   if(f->ref > 0 && f->ip->type == T_FILE && f->ip == ip){
     return 1;
@@ -162,6 +163,7 @@ int test_file_inode(struct file *f, struct inode *ip){
   return -1;
 }
 
+// Adds the new pid bit to the unlocked processes field if the old pid bit was on
 void clone_unlocked(struct file *f, int oldpid, int newpid) {
   uint oldbit = 1 << oldpid;
   uint newbit = 1 << newpid;
@@ -169,4 +171,18 @@ void clone_unlocked(struct file *f, int oldpid, int newpid) {
   if (f->ip->unlocked & oldbit) {
     f->ip->unlocked |= newbit;
   }
+}
+
+// Adds the given pid's bit from the file's unlocked field
+void add_unlocked(struct file *f, int pid) {
+  uint pidbit = 1 << pid;
+
+  f->ip->unlocked |= pidbit;
+}
+
+// Removes the given pid's bit from the file's unlocked field
+void clear_unlocked(struct file *f, int pid) {
+  uint pidbit = 1 << pid;
+
+  f->ip->unlocked &= ~pidbit;
 }
