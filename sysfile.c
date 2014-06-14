@@ -577,13 +577,19 @@ int sys_fprot() {
   //cprintf("Received path: %s, password: %s\n", pathname, password);
 
   if (strlen(password) == 0) {
-    cprintf("Error, password cannot be empty.\n");
+    cprintf("fprot error: password cannot be empty.\n");
     return -1;
   }
 
   //cprintf("sys_fprot: path: %s, pass: %s\n",pathname,password);
   if ((ip = namei(pathname)) < 0) {
     cprintf("fprot error: couldn't resolve path name.\n");
+    return -2;
+  } else if (ip->type != T_FILE) {
+    cprintf("fprot error: can only protect files.\n");
+    return -2;
+  } else if (inode_is_open(ip)) {
+    cprintf("fprot error: inode is already open on a process.\n");
     return -2;
   }
 
@@ -623,7 +629,8 @@ int sys_funprot() {
   // Test if the passwords are equal. Fail if not.  
   if (strlen(password) != strlen(ip->password) ||
       strncmp(password, ip->password, strlen(password)) != 0) {
-    cprintf("funprot: password mismatch, existing password: %s, unprot password: %s\n", ip->password, password);
+    cprintf("funprot error: password mismatch, existing password: %s, unprot password: %s.\n",
+             ip->password, password);
     iunlock(ip);
     return -3;
   }
@@ -641,7 +648,7 @@ int sys_funlock() {
   char *pathname, *password;
   struct inode *ip;  
   if (argstr(0, &pathname) < 0 || argstr(1, &password) < 0){
-    cprintf("funlock: incorrect arguments\n");
+    cprintf("funlock error: incorrect arguments.\n");
     return -1;
   }
   cprintf("funlock: path: %s, pass: %s\n",pathname,password);
@@ -654,7 +661,8 @@ int sys_funlock() {
   // Test if the passwords are equal. Fail if not.  
   if (strlen(password) != strlen(ip->password) ||
       strncmp(password, ip->password, strlen(password)) != 0) {
-    cprintf("funlock: password mismatch, existing password: %s, unlock password: %s\n", ip->password, password);
+    cprintf("funlock error: password mismatch, existing password: %s, unlock password: %s\n",
+             ip->password, password);
     iunlock(ip);
     return -3;
   }
