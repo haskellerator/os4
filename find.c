@@ -54,11 +54,11 @@ fmtname(char *path)
   return buf;
 }
 
-void find(char *path, int len, int follow, int size, int greater, char *name, int type) {
-  // char buf[128], *p;
+void find(char *path, int follow, int size, int greater, char *name, int type) {
+  char buf[128], *p;
   char *temp;
   int fd, display = 1;
-  // struct dirent de;
+  struct dirent de;
   struct stat st;
   
   if((fd = open(path, 0)) < 0){
@@ -77,55 +77,73 @@ void find(char *path, int len, int follow, int size, int greater, char *name, in
 
   switch(st.type){
   case T_FILE:
+  	// Predicates
   	temp = fmtname(path);
   	if (name && strcmp(name, temp) != 0) {
-  		printf(1, "name failed\n");
   		display = 0;
   	}
-
   	if ((greater > 0 && st.size <= size) ||
   	    (greater < 0 && st.size >= size) ||
   	    (greater == 0 && size >= 0 && st.size != size)) {
-  		printf(1, "size failed\n");
   		display = 0;
   	}
-
   	if (type != 0 && type != T_FILE) {
-  		printf(1, "type failed\n");
   		display = 0;
   	}
-
-  	if (display) {
+  	// If predicates passed
+ 	if (display) {
   		printf(1, "%s\n", path);
   	}
 
     break;
   
-  // case T_DIR:
-  //   if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf){
-  //     printf(1, "ls: path too long\n");
-  //     break;
-  //   }
-  //   strcpy(buf, path);
-  //   p = buf+strlen(buf);
-  //   *p++ = '/';
-  //   while(read(fd, &de, sizeof(de)) == sizeof(de)){
-  //     if(de.inum == 0)
-  //       continue;
-  //     memmove(p, de.name, DIRSIZ);
-  //     p[DIRSIZ] = 0;
-  //     if(stat2(buf, &st) < 0){
-  //       printf(1, "ls: cannot stat %s\n", buf);
-  //       continue;
-  //     }
-  //     printf(1, "%s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
-  //   }
-  //   break;
+  case T_DIR:
+    if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf){
+      printf(1, "find: path too long\n");
+      break;
+    }
+
+    // Predicates
+	temp = fmtname(path);    
+  	if (name && strcmp(name, temp) != 0) {
+  		display = 0;
+  	}
+  	if (type != 0 && type != T_DIR) {
+  		display = 0;
+  	}
+
+  	// Add /
+    strcpy(buf, path);
+    p = buf+strlen(buf);
+    if (*(p-1) != '/') {
+    	*p++ = '/';
+    }
+
+  	// If predicates passed
+  	if (display) {
+  		printf(1, "%s\n", path);
+  	}
+
+  	// Next
+    while(read(fd, &de, sizeof(de)) == sizeof(de)){
+		if(de.inum == 0)
+			continue;
+		memmove(p, de.name, DIRSIZ);
+		p[DIRSIZ] = 0;
+		if(stat2(buf, &st) < 0){
+			printf(1, "find: cannot stat %s\n", buf);
+			continue;
+		}
+		if (*p != '.') {
+			find(buf, follow, size, greater, name, type); // Recursive call
+  		}
+    }
+    break;
   }
+
+  // TODO - add case for T_SYMLINK
   close(fd);
 }
-
-
 
 
 int
@@ -133,7 +151,7 @@ main(int argc, char *argv[])
 {
 	int i = 0, follow = 0;
 	int size = -1, greater = 0;
-	char *path, *filename = 0;
+	char *path, *name = 0;
 	int type = 0;
 
 	if (argc < 2) {
@@ -154,7 +172,7 @@ main(int argc, char *argv[])
 
 	while (i < argc) {
 		if (strcmp(argv[i], "-name") == 0) {
-			filename = argv[i+1];
+			name = argv[i+1];
 			i += 2;
 		} else if (strcmp(argv[i], "-size") == 0) {
 			if (argv[i+1][0] == '+') {
@@ -185,32 +203,7 @@ main(int argc, char *argv[])
 		}
 	}
 
-	find(path, strlen(path), follow, size, greater, filename, type);
-
-	// Printout
-	// printf(1, "find: %s\n", path);
-
-	// if (follow) {
-	// 	printf(1, "Follow detected.\n");
-	// }
-
-	// if (filename) {
-	// 	printf(1, "Name: %s\n", filename);
-	// }
-
-	// if (size) {
-	// 	printf(1, "Size: ");
-	// 	if (greater > 0) {
-	// 		printf(1, "+");
-	// 	} else if (greater < 0) {
-	// 		printf(1, "-");
-	// 	}
-	// 	printf(1, "%d\n", size);
-	// }
-
-	// if (type) {
-	// 	printf(1, "Type: %d\n", type);
-	// }
+	find(path, follow, size, greater, name, type);
 	
 	exit();
 }
