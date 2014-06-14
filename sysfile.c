@@ -471,46 +471,6 @@ sys_symlink(void) // const char* ,const char*
 
 #define LOOP_NUM 16
 
-// // TODO maybe integerate it to the namex
-// int 
-// sys_readlink2(void) // const char* , char*, size_t (uint)
-// {
-//   char *pathname, *buf;
-//   int bufsiz, n;
-//   struct inode *ip, *next;
-
-//   //arg fetch
-//   if(argstr(0, &pathname) < 0 || argstr(1, &buf) < 0 || argint(2, &bufsiz) < 0) //|| (ip = namei_sym(pathname,1)) == 0 || ip->type != T_SYMLINK) {
-//     return -1;
-//   }
-
-//   // parsing the path, and checking whet
-
-
-
-
-//   // /A/b/C
-
-//   // /A -> /a
-
-//   // /a/b -> /a/b
-
-//   // /a/b/C -> f/j/c
-
-//   return 0;
-// }
-
-
-// // must buf is null terminated string
-// void readlink_helper(char * buf){
-//   int i = 0;
-//   while(buf[i] != '\0')
-//     i++;
-
-//   if(buf ==)
-// } 
-
-// TODO maybe integerate it to the namex
 int 
 sys_readlink(void) // const char* , char*, size_t (uint)
 {
@@ -525,42 +485,30 @@ sys_readlink(void) // const char* , char*, size_t (uint)
   memset(buf,0,bufsiz); // resets buf before use
 
   // getting the link
-  if((ip = namei_sym(pathname,0)) == 0 || ip->type != T_SYMLINK) {
-    return -2;
+  if((ip = namei_sym(pathname,0)) == 0 || ip->type != T_SYMLINK ||
+     (n = readi(ip,temp,0,ip->size)) <= 0 || n > bufsiz){
+    return -1;
   }
 
-  cprintf("link inum: %d\n", ip->inum);
-  
-  if((n = readi(ip,temp,0,ip->size)) <= 0){
-    return -3;
-  }
-
-  if(n > bufsiz) 
-    return -4;
-
-
-  if(*temp == '/'){
-    cprintf("(wow)\n" );
+  if(*temp == '/'){ // absolute address
     memmove(buf,temp,n);
     return n;
-  } else {
+  } else {          // relative
     char temp2[128];
-    if((ip = nameiparent(pathname,temp2)) == 0) {
-      return -5;
+    if(nameiparent(pathname,temp2) == 0) {
+      return -1;
     }
 
     int old_len = strlen(temp2);
     int new_len = strlen(temp);
     int path_len = strlen(pathname);
 
-    n = path_len - old_len;
+    n = path_len - old_len; // dir length
     
     if(n + new_len > bufsiz)
-      return -6;
+      return -1;
     memmove(buf,pathname,n);
     memmove(buf+n,temp,new_len);
-
-
     return n + new_len;
   }
 

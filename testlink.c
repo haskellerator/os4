@@ -13,7 +13,7 @@ main()
 
 	mkdir("a");
 	mkdir("a/b");
-	if (link("/ls","a/b/c") < 0 || symlink("a","A") < 0 || symlink("c","a/b/C") < 0){
+	if (link("/ls","a/b/c") < 0 || symlink("c","a/b/C") < 0){
 		printf(1,"didnt set test evironment\n");
 	}
 	
