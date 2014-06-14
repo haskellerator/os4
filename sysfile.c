@@ -307,6 +307,12 @@ sys_open(void)
     }
   }
 
+  if (is_protected(ip)) {
+    cprintf("open failed: file is password protected.");
+    iunlockput(ip);
+    return -1;
+  }
+
   if((f = filealloc()) == 0 || (fd = fdalloc(f)) < 0){
     if(f)
       fileclose(f);
@@ -543,6 +549,7 @@ int sys_fprot() {
 int sys_funprot() {
   char *pathname, *password;
   struct inode *ip;
+  begin_trans();
   if (argstr(0, &pathname) < 0 || argstr(1, &password) < 0){
     return -1;
   }
@@ -559,8 +566,9 @@ int sys_funprot() {
   }
   // Reset the password, unlock the file and update the disk copy
   memset(ip->password, 0, sizeof(ip->password));
-  iunlock(ip);
-  iput(ip);
+  iupdate(ip);
+  iunlockput(ip);
+  commit_trans();
 
   return 0;
 }
