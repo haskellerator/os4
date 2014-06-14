@@ -26,7 +26,6 @@ exec(char *path, char **argv)
 
   // task 2
   if (is_protected(ip)) {
-    cprintf("File is password protected!\n");
     goto bad;
   }
 
