@@ -308,7 +308,7 @@ sys_open(void)
   }
 
   if (is_protected(ip)) {
-    cprintf("open failed: file is password protected.");
+    cprintf("open failed: %s is password protected.\n", path);
     iunlockput(ip);
     return -1;
   }
