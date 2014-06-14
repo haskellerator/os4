@@ -675,17 +675,19 @@ skipelem(char *path, char *name)
 // If parent != 0, return the inode for the parent and copy the final
 // path element into name, which must have room for DIRSIZ bytes.
 static struct inode*
-namex(char *path, int nameiparent, char *name, int deref, uint loops)
+namex(struct inode *root,char *path, int nameiparent, char *name, int deref, uint loops)
 {
   struct inode *ip, *next;
   char buf[128], name2[DIRSIZ]; // changes for task1b
   uint deref_flag = 0;
-
   if(*path == '/')
     ip = iget(ROOTDEV, ROOTINO);
+  else if(root)
+    ip = idup(root);
   else
     ip = idup(proc->cwd);
 
+  // cprintf("path: <%s>\n",path);
   while((path = skipelem(path, name)) != 0){
     ilock(ip);
     if(ip->type != T_DIR){
@@ -732,11 +734,12 @@ namex(char *path, int nameiparent, char *name, int deref, uint loops)
           iput(ip);
           return 0;// break;
       }
-      if((next = namex(buf,0,name2, deref, loops-1)) == 0){
-        cprintf("debug next null");
-        iput(ip);
-        return 0;
-      }
+      next = namex(ip,buf,0,name2, deref, loops-1);
+      // if((next = namex(buf,0,name2, deref, loops-1)) == 0){
+        // cprintf("debug next null");
+        // iput(ip);
+        // return 0;
+      // }
       deref_flag = deref | (*path != '\0'); 
       // cprintf("2deref: %d, pred: %d, flag: %d\n",deref,(*path == '\0'),deref_flag);
       // cprintf("read: %s\n",buf);
@@ -759,7 +762,7 @@ struct inode*
 namei(char *path)
 {
   char name[DIRSIZ];
-  return namex(path, 0, name, 1, LOOP_NUM);
+  return namex(0, path, 0, name, 1, LOOP_NUM);
 }
 
 struct inode*
@@ -767,11 +770,11 @@ namei_sym(char *path, int deref)
 {
   char name[DIRSIZ];
   // cprintf("been here in namei_sym %d\n", deref);
-  return namex(path, 0, name, deref, LOOP_NUM);
+  return namex(0, path, 0, name, deref, LOOP_NUM);
 }
 
 struct inode*
 nameiparent(char *path, char *name)
 {
-  return namex(path, 1, name, 0, LOOP_NUM);
+  return namex(0 ,path, 1, name, 0, LOOP_NUM);
 }
