@@ -19,8 +19,10 @@ exec(char *path, char **argv)
   struct proghdr ph;
   pde_t *pgdir, *oldpgdir;
 
-  if((ip = namei(path)) == 0)
+  if((ip = namei(path)) == 0){
+    cprintf("exec null;\n");
     return -1;
+  }
   ilock(ip);
   pgdir = 0;
 
