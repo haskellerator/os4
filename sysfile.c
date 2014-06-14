@@ -283,12 +283,12 @@ sys_open(void)
   int fd, omode;
   struct file *f;
   struct inode *ip;
-  int ignorelink;
+  int deref;
 
   if(argstr(0, &path) < 0 || argint(1, &omode) < 0)
     return -1;
 
-  ignorelink = omode & O_NOREF ? 1 : 0;
+  deref = omode & O_NOREF ? 0 : 1;
   omode &= ~O_NOREF;
 
   if(omode & O_CREATE){
@@ -298,7 +298,7 @@ sys_open(void)
     if(ip == 0)
       return -1;
   } else {
-    if((ip = namei_sym(path, ignorelink)) == 0)
+    if((ip = namei_sym(path, deref)) == 0)
       return -1;
     ilock(ip);
     if(ip->type == T_DIR && omode != O_RDONLY){

@@ -701,10 +701,10 @@ namex(char *path, int nameiparent, char *name, int deref, uint loops)
       iunlockput(ip);
       return 0;
     }
-    cprintf("path: <%c>\n",*path);
+    // cprintf("path: <%s>\n",path);
     // task1 changes starts here
-    deref_flag = deref | (*path == '\0');
-    cprintf("deref: %d, pred: %d, flag: %d",deref,(*path == '\0'),deref_flag);
+    deref_flag = deref | (*path != '\0');
+    // cprintf("deref: %d, pred: %d, flag: %d\n",deref,(*path == '\0'),deref_flag);
     // iunlockput(ip);
     iunlock(ip);
     ilock(next);
@@ -737,7 +737,8 @@ namex(char *path, int nameiparent, char *name, int deref, uint loops)
         iput(ip);
         return 0;
       }
-      deref_flag = deref | (*path == '\0'); 
+      deref_flag = deref | (*path != '\0'); 
+      // cprintf("2deref: %d, pred: %d, flag: %d\n",deref,(*path == '\0'),deref_flag);
       // cprintf("read: %s\n",buf);
     }else{
       iunlock(next);
@@ -758,7 +759,7 @@ struct inode*
 namei(char *path)
 {
   char name[DIRSIZ];
-  return namex(path, 0, name, 0, LOOP_NUM);
+  return namex(path, 0, name, 1, LOOP_NUM);
 }
 
 struct inode*
