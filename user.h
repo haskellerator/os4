@@ -29,9 +29,9 @@ int symlink(char*, char*);
 int readlink(char*, char *,size_t);
 
 // task2 addition
-int fprot( char*, char*);
-int funprot( char*, char*);
-int funlock( char*, char*);
+int fprot(char*, char*);
+int funprot(char*, char*);
+int funlock(char*, char*);
 
 // ulib.c
 int stat(char*, struct stat*);
