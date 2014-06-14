@@ -675,11 +675,11 @@ skipelem(char *path, char *name)
 // If parent != 0, return the inode for the parent and copy the final
 // path element into name, which must have room for DIRSIZ bytes.
 static struct inode*
-namex(char *path, int nameiparent, char *name, int ignorelink, uint loops)
+namex(char *path, int nameiparent, char *name, int deref, uint loops)
 {
   struct inode *ip, *next;
   char buf[128], name2[DIRSIZ]; // changes for task1b
-
+  uint deref_flag = 0;
 
   if(*path == '/')
     ip = iget(ROOTDEV, ROOTINO);
@@ -701,15 +701,16 @@ namex(char *path, int nameiparent, char *name, int ignorelink, uint loops)
       iunlockput(ip);
       return 0;
     }
-
+    cprintf("path: <%c>\n",*path);
     // task1 changes starts here
-
+    deref_flag = deref | (*path == '\0');
+    cprintf("deref: %d, pred: %d, flag: %d",deref,(*path == '\0'),deref_flag);
     // iunlockput(ip);
     iunlock(ip);
     ilock(next);
     // cprintf("inside namex!!!!!!!!!!!! %d\n",next->type);
 
-    if(next->type == T_SYMLINK && !ignorelink){ // if next file is of symlink type
+    if(next->type == T_SYMLINK && deref_flag){ // if next file is of symlink type
       // open file and reads its contents
       if(readi(next,buf,0,next->size) != next->size){ 
         // if read fails
@@ -717,7 +718,7 @@ namex(char *path, int nameiparent, char *name, int ignorelink, uint loops)
         iunlockput(next); 
         iput(ip);
         return 0;
-      }  
+      }   
 
       buf[next->size] = 0; // null terminates string
       iunlockput(next);
@@ -729,9 +730,14 @@ namex(char *path, int nameiparent, char *name, int ignorelink, uint loops)
       if(loops == 0){ // avoid infinite
           cprintf("Error: infinite loop\n"); //TODO: maybe replace with panic
           iput(ip);
-          break;
+          return 0;// break;
       }
-      next = namex(buf,0,name2, ignorelink, loops-1); 
+      if((next = namex(buf,0,name2, deref, loops-1)) == 0){
+        cprintf("debug next null");
+        iput(ip);
+        return 0;
+      }
+      deref_flag = deref | (*path == '\0'); 
       // cprintf("read: %s\n",buf);
     }else{
       iunlock(next);
@@ -756,11 +762,11 @@ namei(char *path)
 }
 
 struct inode*
-namei_sym(char *path, int ignorelink)
+namei_sym(char *path, int deref)
 {
   char name[DIRSIZ];
-  // cprintf("been here in namei_sym %d\n", ignorelink);
-  return namex(path, 0, name, ignorelink, LOOP_NUM);
+  // cprintf("been here in namei_sym %d\n", deref);
+  return namex(path, 0, name, deref, LOOP_NUM);
 }
 
 struct inode*

@@ -483,10 +483,13 @@ sys_readlink(void) // const char* , char*, size_t (uint)
    * then next is promoted to be new ip. otherwise (next type is not symbolic link)
    * buf is returned (cuz contains non symbolic link which is legal) */
    
-  while((n = readi(ip,buf,0,ip->size)) >= 0 && ip->type == T_SYMLINK && loop--){
+  while((n = readi(ip,buf,0,ip->size)) >= 0 && ip->type == T_SYMLINK ){
+    loop--;
     buf[ip->size] = '\0'; // null terminates string
-    
-    if(n <= 0 || (next = namei_sym(buf,1)) == 0){ // checks that read was done properly and then fetches inode
+    // cprintf("loop %d",loop);
+    if(n <= 0 || (next = namei_sym(buf,1)) == 0 || loop == 0){ // checks that read was done properly and then fetches inode
+      buf[0] = '\0'; // null terminates string
+      if(!loop) cprintf("Readlink: Infinite loop\n");
       return -1; // if conditions not met, exit
     } else if(next->type != T_SYMLINK){  // next type is not symbolic, so we return
       return n;
@@ -494,7 +497,6 @@ sys_readlink(void) // const char* , char*, size_t (uint)
       ip = next;
     }
   }
-
   return n;
 }
 
