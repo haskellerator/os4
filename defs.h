@@ -123,7 +123,7 @@ void            wakeup(void*);
 void            yield(void);
 int 			is_unlocked(struct inode*);
 void 			proc_unlock(struct inode*);
-
+int 			inode_is_open(struct inode*);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

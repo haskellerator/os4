@@ -480,10 +480,28 @@ procdump(void)
   }
 }
 
+// Returns the unlock status of inode ip on the running process
 int is_unlocked(struct inode *ip) {
   return proc->unlocked[get_inum(ip)];
 }
 
+// Unlocks the inode ip on the running process
 void proc_unlock(struct inode *ip) {
   proc->unlocked[get_inum(ip)] = 1;
+}
+
+// Checks if the given inode is open on an existing process
+int inode_is_open(struct inode *ip) {
+  int i;
+  struct proc *p;  
+
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    for(i = 0; i < NOFILE; i++) {
+      if(p->ofile[i] && get_file_inode(p->ofile[i]) == ip) {
+        return 1;
+      }
+    }  
+  }
+
+  return 0;
 }
