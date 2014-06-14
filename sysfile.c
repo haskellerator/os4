@@ -471,38 +471,99 @@ sys_symlink(void) // const char* ,const char*
 
 #define LOOP_NUM 16
 
+// // TODO maybe integerate it to the namex
+// int 
+// sys_readlink2(void) // const char* , char*, size_t (uint)
+// {
+//   char *pathname, *buf;
+//   int bufsiz, n;
+//   struct inode *ip, *next;
+
+//   //arg fetch
+//   if(argstr(0, &pathname) < 0 || argstr(1, &buf) < 0 || argint(2, &bufsiz) < 0) //|| (ip = namei_sym(pathname,1)) == 0 || ip->type != T_SYMLINK) {
+//     return -1;
+//   }
+
+//   // parsing the path, and checking whet
+
+
+
+
+//   // /A/b/C
+
+//   // /A -> /a
+
+//   // /a/b -> /a/b
+
+//   // /a/b/C -> f/j/c
+
+//   return 0;
+// }
+
+
+// // must buf is null terminated string
+// void readlink_helper(char * buf){
+//   int i = 0;
+//   while(buf[i] != '\0')
+//     i++;
+
+//   if(buf ==)
+// } 
+
 // TODO maybe integerate it to the namex
 int 
 sys_readlink(void) // const char* , char*, size_t (uint)
 {
-  char *pathname, *buf;
-  int bufsiz, n;
-  struct inode *ip, *next;
-  if(argstr(0, &pathname) < 0 || argstr(1, &buf) < 0 || argint(2, &bufsiz) < 0 || (ip = namei_sym(pathname,1)) == 0 || ip->type != T_SYMLINK) {
+  char *pathname, *buf, temp[512];
+  int bufsiz, n = 0;
+  struct inode *ip; //, *next;
+  // arg fetch
+  if(argstr(0, &pathname) < 0 || argstr(1, &buf) < 0 || argint(2, &bufsiz) < 0){ 
     return -1;
   }
 
-  int loop = LOOP_NUM; // loops arg, to avoid infinite loops
+  memset(buf,0,bufsiz); // resets buf before use
 
-  /* this loop reads the ip contents, if they point to another symbolic link (next),
-   * then next is promoted to be new ip. otherwise (next type is not symbolic link)
-   * buf is returned (cuz contains non symbolic link which is legal) */
-   
-  while((n = readi(ip,buf,0,ip->size)) >= 0 && ip->type == T_SYMLINK ){
-    loop--;
-    buf[ip->size] = '\0'; // null terminates string
-    // cprintf("loop %d",loop);
-    if(n <= 0 || (next = namei_sym(buf,1)) == 0 || loop == 0){ // checks that read was done properly and then fetches inode
-      buf[0] = '\0'; // null terminates string
-      if(!loop) cprintf("Readlink: Infinite loop\n");
-      return -1; // if conditions not met, exit
-    } else if(next->type != T_SYMLINK){  // next type is not symbolic, so we return
-      return n;
-    } else{  // moves to the next level in the chain
-      ip = next;
-    }
+  // getting the link
+  if((ip = namei_sym(pathname,0)) == 0 || ip->type != T_SYMLINK) {
+    return -2;
   }
-  return n;
+
+  cprintf("link inum: %d\n", ip->inum);
+  
+  if((n = readi(ip,temp,0,ip->size)) <= 0){
+    return -3;
+  }
+
+  if(n > bufsiz) 
+    return -4;
+
+
+  if(*temp == '/'){
+    cprintf("(wow)\n" );
+    memmove(buf,temp,n);
+    return n;
+  } else {
+    char temp2[128];
+    if((ip = nameiparent(pathname,temp2)) == 0) {
+      return -5;
+    }
+
+    int old_len = strlen(temp2);
+    int new_len = strlen(temp);
+    int path_len = strlen(pathname);
+
+    n = path_len - old_len;
+    
+    if(n + new_len > bufsiz)
+      return -6;
+    memmove(buf,pathname,n);
+    memmove(buf+n,temp,new_len);
+
+
+    return n + new_len;
+  }
+
 }
 
 // task2 additions. args for all of them: (const char *pathname, const char *password)

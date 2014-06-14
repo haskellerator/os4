@@ -6,14 +6,27 @@
 int
 main()
 {
-	symlink("/blabla2","blabla");
-	symlink("/blabla3","blabla2");
-	symlink("/blabla2","blabla3");
-
+	int n;
 	char buf[128];
-	int n = readlink("/blabla2",buf, 82);
+	/*sets the environment for testing . creates a/b/c 
+	 * and a link C -> c*/ 
 
-	printf(1,"test2 %d %s\n", n, buf);
-	// printf(1,"test2\n");
+	mkdir("a");
+	mkdir("a/b");
+	if (link("/ls","a/b/c") < 0 || symlink("a","A") < 0 || symlink("c","a/b/C") < 0){
+		printf(1,"didnt set test evironment\n");
+	}
+	
+	n = readlink("a/b/C",buf,128);
+	printf(1,"test2 output: %d buf: %s supposed: a/b/c\n", n, buf);
+	n = readlink("/a/b/C",buf,128);
+	printf(1,"test2 output: %d buf: %s supposed: /a/b/c\n", n, buf);
+	
+	chdir("a/b"); // from a/b
+	
+	n = readlink("C",buf,128);
+	printf(1,"test2 output: %d buf: %s supposed: c\n", n, buf);
+	n = readlink("/a/b/C",buf,128);
+	printf(1,"test2 output: %d buf: %s supposed: /a/b/c\n", n, buf);
 	exit();
 }
