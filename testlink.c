@@ -6,8 +6,9 @@
 int
 main()
 {
-	symlink("/ls","blabla");
-	symlink("ls","blabla2");
+	symlink("/blabla2","blabla");
+	symlink("/blabla3","blabla2");
+	symlink("/blabla2","blabla3");
 
 	char buf[128];
 	int n = readlink("/blabla2",buf, 82);
