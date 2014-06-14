@@ -508,7 +508,6 @@ sys_readlink(void) // const char* , char*, size_t (uint)
 int sys_fprot() {
   char *pathname, *password;
   struct inode *ip;
-  begin_trans();
   if (argstr(0, &pathname) < 0 || argstr(1, &password) < 0){
     return -1;
   }
@@ -534,8 +533,10 @@ int sys_fprot() {
     cprintf("fprot error: existing password.\n");    
     return -3;
   }
+  begin_trans();
+
   // Set the password, unlock the file and update the disk copy
-  memmove(ip->password, password, sizeof(password));
+  memmove(ip->password, password, sizeof(password)+1);
 
   //cprintf("%s new password is: %s, inode %d\n", pathname, ip->password, ip->inum);
   iupdate(ip);
@@ -547,7 +548,6 @@ int sys_fprot() {
 int sys_funprot() {
   char *pathname, *password;
   struct inode *ip;
-  begin_trans();
   if (argstr(0, &pathname) < 0 || argstr(1, &password) < 0){
     return -1;
   }
@@ -558,12 +558,15 @@ int sys_funprot() {
   // Lock the inode
   ilock(ip);
   // Test if the passwords are equal. Fail if not.  
-  if (strncmp(password, ip->password, strlen(password)) != 0) {
+  if (strlen(password) != strlen(ip->password) ||
+      strncmp(password, ip->password, strlen(password)) != 0) {
+    cprintf("funprot: existing password: %s, unlock password: %s\n", ip->password, password);
     iunlock(ip);
     return -3;
   }
   // Reset the password, unlock the file and update the disk copy
-  memset(ip->password, 0, sizeof(ip->password));
+  begin_trans();
+  memset(ip->password, 0, 10);
   iupdate(ip);
   iunlockput(ip);
   commit_trans();
