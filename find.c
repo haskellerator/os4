@@ -61,8 +61,8 @@ void find(char *path, int follow, int size, int greater, char *name, int type) {
   int fd, display = 1;
   struct dirent de;
   struct stat st;
-  
-  if((fd = open(path, 0)) < 0){
+
+  if((fd = open(path, (1-follow)*O_NOREF)) < 0){
     printf(2, "find: cannot open %s\n", path);
     return;
   }
@@ -139,31 +139,31 @@ void find(char *path, int follow, int size, int greater, char *name, int type) {
     break;
 
   case T_SYMLINK:
-  	printf(1, "Got here, follow is %d\n", follow);
-	if (follow) {
-		printf(1, "Following\n");
-		readlink(path, buf, 128);
-		printf(1, "Link contents: %s\n", buf);
-		strcpy(path, buf);
-		find(path, follow, size, greater, name, type);
-	} else {
-		temp = fmtname(path);    
-	  	if (name && strcmp(name, temp) != 0) {
-	  		display = 0;
-	  	}
-  	  	if ((greater > 0 && st.size <= size) ||
-	  	    (greater < 0 && st.size >= size) ||
-	  	    (greater == 0 && size >= 0 && st.size != size)) {
-	  		display = 0;
-	  	}
-	  	if (type != 0 && type != T_SYMLINK) {
-	  		display = 0;
-	  	}  	
-  	  	// If predicates passed
- 	 	if (display) {
-  			printf(1, "%s\n", path);
-  		}
+ 	// printf(1, "Got here, follow is %d\n", follow);
+	// if (follow) {
+	// 	printf(1, "Following\n");
+	// 	readlink(path, buf, 128);
+	// 	printf(1, "Link contents: %s\n", buf);
+	// 	strcpy(path, buf);
+	// 	find(path, follow, size, greater, name, type);
+	// } else {
+	temp = fmtname(path);    
+  	if (name && strcmp(name, temp) != 0) {
+  		display = 0;
   	}
+	  	if ((greater > 0 && st.size <= size) ||
+  	    (greater < 0 && st.size >= size) ||
+  	    (greater == 0 && size >= 0 && st.size != size)) {
+  		display = 0;
+  	}
+  	if (type != 0 && type != T_SYMLINK) {
+  		display = 0;
+  	}  	
+  	// If predicates passed
+ 	if (display) {
+		printf(1, "%s\n", path);
+	}
+  	//}
   	break;
 
   }
