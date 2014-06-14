@@ -3,7 +3,33 @@
 #include "user.h"
 
 void print_help() {
-	printf(1, "This is the help printout.\n");
+	printf(1, "Find\n");
+	printf(1, "    This application searches for files, directories and symlinks inside\n");
+	printf(1, "    the given path. Command syntax:\n\n");
+
+	printf(1, "    find <path> <options> <predicates>\n\n");
+
+	printf(1, "Options:\n");
+	printf(1, "    -follow\n");
+	printf(1, "        Dereference symbolic links. If a symbolic link is encountered,\n");
+	printf(1, "        apply tests to the target of the link. If a symbolic link\n");
+	printf(1, "        points to a directory, then descend into it.\n\n");
+
+	printf(1, "    -help\n");
+	printf(1, "        Display this message.\n\n");
+
+	printf(1, "Predicates:\n");
+	printf(1, "    -name filename\n");
+	printf(1, "        All files named \"filename\" in the given path.\n\n");
+
+	printf(1, "    -size [+/-]n\n");
+	printf(1, "        Files of size n (exactly), +n (more than n), -n (less than n).\n\n");
+
+	printf(1, "    -type t\n");
+	printf(1, "        Files of type:\n");
+	printf(1, "        d        directory\n");
+	printf(1, "        f        regular file\n");
+	printf(1, "        s        soft (symbolic) link\n");
 }
 
 
