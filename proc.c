@@ -479,3 +479,11 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+int is_unlocked(struct inode *ip) {
+  return proc->unlocked[get_inum(ip)];
+}
+
+void proc_unlock(struct inode *ip) {
+  proc->unlocked[get_inum(ip)] = 1;
+}

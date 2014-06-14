@@ -166,3 +166,11 @@ int test_file_inode(struct file *f, struct inode *ip){
 int is_protected(struct inode *ip) {
   return ip->password[0] != 0;
 }
+
+int get_inum(struct inode *ip) {
+  return ip->inum;
+}
+
+struct inode* get_file_inode(struct file *f) {
+  return f->ip;
+}

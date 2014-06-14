@@ -16,7 +16,6 @@ cat(int fd)
     write(1, buf, n);
   if(n < 0){
     printf(1, "cat: read error\n");
-    exit();
   }
 }
 
@@ -26,6 +25,7 @@ main(int argc, char *argv[])
 {
 	if(argc !=3){
 		printf(2,"Usage: test2 pathname password\n");
+		exit();
 	}
 
 	char * pathname = argv[1];
@@ -34,6 +34,8 @@ main(int argc, char *argv[])
 	int pid,unlock, fd, prot,br,unprot;
 	
 	// locks file with password
+
+	printf(1, "Attempting to protect %s with password %s\n", pathname, password);
 	if((prot = fprot(pathname, password)) < 0){
 		printf(1,"protection failed: %d\n" ,prot);
 		exit();
@@ -42,16 +44,16 @@ main(int argc, char *argv[])
 	printf(1,"protection successful\n"); 
 
 	if((pid = fork()) == 0){ // child process
-		
+		printf(1, "Child attempting to unlock %s\n", pathname);
 		// unlocks file
 		if((unlock = funlock(pathname,password)) < 0){
 			printf(1,"child: unlock failed: %d\n" ,unlock); 
 			exit();
 		} 
-
 		printf(1,"child: unlock successful\n"); 
 		
 		// open file to read
+		printf(1, "Child attempting to open unlocked file %s\n", pathname);		
 		if((fd = open(pathname, O_RDONLY)) < 0){
 			printf(1,"child: open failed\n"); 
 			exit(); 		
@@ -79,13 +81,12 @@ main(int argc, char *argv[])
 		wait(); // wait for child
 
 		// open file
-		if((fd = open(pathname, O_RDONLY)) < 0){
-			printf(1,"parent: open failed\n");  // if failed, print failed to open
+		if((fd = open(pathname, O_RDONLY)) >= 0){
+			printf(1,"parent: open successful\n"); 
 			exit(); 		
 		}	
-		printf(1,"parent: open successful\nparent: now cat supposed to fail\n"); 
 
-
+		printf(1,"parent: open failed\nparent: now cat supposed to fail\n"); 
 
 		// read using cat while still protected
 		cat(fd); // supposed to fail
@@ -96,7 +97,7 @@ main(int argc, char *argv[])
 			exit();
 		} 
 
-		printf(1,"parent: unprotect successful\nparent: now cat supposed to succeed"); 
+		printf(1,"parent: unprotect successful\nparent: now cat supposed to succeed\n"); 
 
 		cat(fd); // supposed to succeed
 	}

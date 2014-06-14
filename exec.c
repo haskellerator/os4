@@ -25,7 +25,7 @@ exec(char *path, char **argv)
   pgdir = 0;
 
   // task 2
-  if (is_protected(ip)) {
+  if (is_protected(ip) && !is_unlocked(ip)) {
     goto bad;
   }
 
