@@ -479,23 +479,3 @@ procdump(void)
     cprintf("\n");
   }
 }
-
-
-// Searches the ptable for a process using the given inode
-// Returns 1 if found, 0 if none found
-int check_inode(struct inode *ip) {
-  struct proc *p;
-  int i, result = 0;
-
-  acquire(&ptable.lock);
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-    for(i = 0; i< NOFILE; i++){
-      if ((result = test_file_inode(p->ofile[i], ip)) > 0) {
-        break;
-      }
-    }
-  }
-  release(&ptable.lock);
-  return result;
-}
-

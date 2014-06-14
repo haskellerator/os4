@@ -456,7 +456,6 @@ sys_symlink(void) // const char* ,const char*
   // ip->type = T_SYMLINK;
   // these functions purpose is to change the inode bit flags, so that it will be released for use
   iunlockput(ip);  
-  iput(ip);
 
   // cprintf("here syslink: %s %s %d %d\n", oldpath, newpath,ip->inum,ip->type);
   commit_trans();
@@ -503,9 +502,12 @@ sys_readlink(void) // const char* , char*, size_t (uint)
 int sys_fprot() {
   char *pathname, *password;
   struct inode *ip;
+  begin_trans();
   if (argstr(0, &pathname) < 0 || argstr(1, &password) < 0){
     return -1;
   }
+  //cprintf("Received path: %s, password: %s\n", pathname, password);
+
   if (strlen(password) == 0) {
     cprintf("Error, password cannot be empty.\n");
     return -1;
@@ -513,20 +515,26 @@ int sys_fprot() {
 
   //cprintf("sys_fprot: path: %s, pass: %s\n",pathname,password);
   if ((ip = namei(pathname)) < 0) {
+    cprintf("fprot error: couldn't resolve path name.\n");
     return -2;
   }
+
   // Lock the inode
   ilock(ip);
-  // Test if the inode is already open or has a set password (already protected)
-  if (check_inode(ip) < 0 || ip->password[0] != 0) {
+  // Test if the inode is already open or has a set password (already protected)  
+
+  if (ip->password[0] != 0) {
     iunlock(ip);
+    cprintf("fprot error: existing password.\n");    
     return -3;
   }
   // Set the password, unlock the file and update the disk copy
   memmove(ip->password, password, sizeof(password));
-  iunlock(ip);
-  iput(ip);
 
+  //cprintf("%s new password is: %s, inode %d\n", pathname, ip->password, ip->inum);
+  iupdate(ip);
+  iunlockput(ip);
+  commit_trans();
   return 0;
 }
 
