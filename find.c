@@ -36,7 +36,7 @@ void print_help() {
 }
 
 char*
-fmtname(char *path)
+fmtname(char *path) // Function to extract the last name in a dir path. Taken from ls.c
 {
   static char buf[DIRSIZ+1];
   char *p;
@@ -139,14 +139,11 @@ void find(char *path, int follow, int size, int greater, char *name, int type) {
     break;
 
   case T_SYMLINK:
- 	// printf(1, "Got here, follow is %d\n", follow);
-	if (follow) {
-		printf(1, "Following\n");
+	if (follow) { // Follow into symlinks
 		readlink(path, buf, 128);
-		printf(1, "Link contents: %s\n", buf);
 		strcpy(path, buf);
 		find(path, follow, size, greater, name, type);
-	} else {
+	} else {	// Display symlinks normally
 		temp = fmtname(path);    
 	  	if (name && strcmp(name, temp) != 0) {
 	  		display = 0;
@@ -182,6 +179,11 @@ main(int argc, char *argv[])
 
 	if (argc < 2) {
 		printf(1, "usage: find <path> <options> <preds>\n");
+		exit();
+	}
+
+	if (strcmp(argv[1], "-help") == 0) {
+		print_help();
 		exit();
 	}
 
