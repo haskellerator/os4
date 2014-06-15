@@ -141,8 +141,7 @@ void find(char *path, int follow, int size, int greater, char *name, int type) {
   case T_SYMLINK:
 	if (follow) { // Follow into symlinks
 		readlink(path, buf, 128);
-		strcpy(path, buf);
-		find(path, follow, size, greater, name, type);
+		find(buf, follow, size, greater, name, type);
 	} else {	// Display symlinks normally
 		temp = fmtname(path);    
 	  	if (name && strcmp(name, temp) != 0) {
