@@ -457,7 +457,7 @@ sys_symlink(void) // const char* ,const char*
 
   // ilock(ip);
   // // then holds the pointer to old path
-  writei(ip,oldpath,0,strlen(oldpath)); 
+  writei(ip,oldpath,0,strlen(oldpath));
 
   // ip->type = T_SYMLINK;
   // these functions purpose is to change the inode bit flags, so that it will be released for use
@@ -482,16 +482,18 @@ sys_readlink(void) // const char* , char*, size_t (uint)
     return -1;
   }
 
-  memset(buf,0,bufsiz); // resets buf before use
+  memset(buf,'\0',bufsiz); // resets buf before use
 
   // getting the link
   if((ip = namei_sym(pathname,0)) == 0 || ip->type != T_SYMLINK ||
      (n = readi(ip,temp,0,ip->size)) <= 0 || n > bufsiz){
     return -1;
   }
+  temp[n] = '\0';  // Addition for lab computers
 
   if(*temp == '/'){ // absolute address
     memmove(buf,temp,n);
+    *(buf+n) = '\0';
     return n;
   } else {          // relative
     char temp2[128];
@@ -500,15 +502,17 @@ sys_readlink(void) // const char* , char*, size_t (uint)
     }
 
     int old_len = strlen(temp2);
-    int new_len = strlen(temp);
+    int new_len = n;
     int path_len = strlen(pathname);
 
     n = path_len - old_len; // dir length
     
     if(n + new_len > bufsiz)
       return -1;
+
     memmove(buf,pathname,n);
     memmove(buf+n,temp,new_len);
+
     return n + new_len;
   }
 

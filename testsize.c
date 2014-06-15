@@ -16,8 +16,7 @@ main()
   }
 
   sectors = 0;
-  // while(1){
-  while(sectors < 2){
+  while(1){  
     *(int*)buf = sectors;
     int cc = write(fd, buf, sizeof(buf));
     if(cc <= 0)
@@ -29,8 +28,6 @@ main()
       printf(1, "Finished writing 70KB (single indirect)\n");
     if (sectors == 2000)
       printf(1, "Finished writing 1MB\n");
-
-  
   }
 
   printf(1, "Finished writing 8MB\n");

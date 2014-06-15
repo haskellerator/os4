@@ -12,21 +12,22 @@ main()
 	 * and a link C -> c*/ 
 
 	mkdir("a");
-	mkdir("a/b");
-	if (link("/ls","a/b/c") < 0 || symlink("c","a/b/C") < 0){
+	mkdir("a/d");
+	mkdir("a/d/b");
+	if (link("/ls","a/d/b/c") < 0 || symlink("c","a/d/b/C") < 0){
 		printf(1,"didnt set test evironment\n");
 	}
 	
-	n = readlink("a/b/C",buf,128);
-	printf(1,"test2 output: %d buf: %s supposed: a/b/c\n", n, buf);
-	n = readlink("/a/b/C",buf,128);
-	printf(1,"test2 output: %d buf: %s supposed: /a/b/c\n", n, buf);
+	// n = readlink("a/b/C",buf,128);
+	// printf(1,"test2 output: %d buf: %s supposed: a/b/c\n", n, buf);
+	// n = readlink("/a/b/C",buf,128);
+	// printf(1,"test2 output: %d buf: %s supposed: /a/b/c\n", n, buf);
 	
-	chdir("a/b"); // from a/b
+	chdir("a/d/b"); // from a/b
 	
 	n = readlink("C",buf,128);
 	printf(1,"test2 output: %d buf: %s supposed: c\n", n, buf);
-	n = readlink("/a/b/C",buf,128);
-	printf(1,"test2 output: %d buf: %s supposed: /a/b/c\n", n, buf);
+	// n = readlink("/a/b/C",buf,128);
+	// printf(1,"test2 output: %d buf: %s supposed: /a/b/c\n", n, buf);
 	exit();
 }

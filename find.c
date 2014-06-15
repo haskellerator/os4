@@ -119,7 +119,7 @@ void find(char *path, int follow, int size, int greater, char *name, int type) {
 
   	// If predicates passed
   	if (display) {
-  		printf(1, "%s\n", path);
+  		printf(1, "%s%s\n", path, strlen(path) > 1 ? "/" : "");
   	}
 
   	// Next
@@ -205,7 +205,7 @@ main(int argc, char *argv[])
 			if (argv[i+1][0] == '+') {
 				greater = 1;
 				size = atoi(argv[i+1]+1);
-			} else if (argv[i+1][1] == '-') {
+			} else if (argv[i+1][0] == '-') {				
 				greater = -1;
 				size = atoi(argv[i+1]+1);
 			} else {
