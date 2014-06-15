@@ -71,8 +71,6 @@ main(int argc, char *argv[])
     exit(1);
   }
 
-  printf("Size of uint: %d\n", sizeof(uint));
-  printf("Size of dinode struct: %d\n", sizeof(struct dinode));
   assert((BUF_SIZE % sizeof(struct dinode)) == 0); // check that dinode is multi of blocksize
   assert((BUF_SIZE % sizeof(struct dirent)) == 0);
 

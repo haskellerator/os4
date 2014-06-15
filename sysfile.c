@@ -526,14 +526,12 @@ int sys_fprot() {
   if (argstr(0, &pathname) < 0 || argstr(1, &password) < 0){
     return -1;
   }
-  //cprintf("Received path: %s, password: %s\n", pathname, password);
 
   if (strlen(password) == 0) {
     cprintf("fprot error: password cannot be empty.\n");
     return -1;
   }
 
-  //cprintf("sys_fprot: path: %s, pass: %s\n",pathname,password);
   if ((ip = namei(pathname)) < 0) {
     cprintf("fprot error: couldn't resolve path name.\n");
     return -2;
@@ -547,8 +545,8 @@ int sys_fprot() {
 
   // Lock the inode
   ilock(ip);
-  // Test if the inode is already open or has a set password (already protected)  
 
+  // Test if the inode is already open or has a set password (already protected)  
   if (ip->password[0] != 0) {
     iunlock(ip);
     cprintf("fprot error: existing password.\n");    
@@ -559,7 +557,6 @@ int sys_fprot() {
   // Set the password, unlock the file and update the disk copy
   memmove(ip->password, password, sizeof(password)+1);
 
-  //cprintf("%s new password is: %s, inode %d\n", pathname, ip->password, ip->inum);
   iupdate(ip);
   iunlockput(ip);
   commit_trans();
@@ -572,7 +569,6 @@ int sys_funprot() {
   if (argstr(0, &pathname) < 0 || argstr(1, &password) < 0){
     return -1;
   }
-  //cprintf("sys_funprot: path: %s, pass: %s\n",pathname,password);
   if ((ip = namei(pathname)) < 0) {
     return -2;
   }
@@ -581,7 +577,7 @@ int sys_funprot() {
   // Test if the passwords are equal. Fail if not.  
   if (strlen(password) != strlen(ip->password) ||
       strncmp(password, ip->password, strlen(password)) != 0) {
-    cprintf("funprot error: password mismatch, existing password: %s, unprot password: %s.\n",
+    cprintf("funprot error: password mismatch.\n",
              ip->password, password);
     iunlock(ip);
     return -3;
@@ -603,7 +599,6 @@ int sys_funlock() {
     cprintf("funlock error: incorrect arguments.\n");
     return -1;
   }
-  cprintf("funlock: path: %s, pass: %s\n",pathname,password);
   
   if ((ip = namei(pathname)) < 0) {
     return -2;
@@ -613,7 +608,7 @@ int sys_funlock() {
   // Test if the passwords are equal. Fail if not.  
   if (strlen(password) != strlen(ip->password) ||
       strncmp(password, ip->password, strlen(password)) != 0) {
-    cprintf("funlock error: password mismatch, existing password: %s, unlock password: %s\n",
+    cprintf("funlock error: password mismatch.\n",
              ip->password, password);
     iunlock(ip);
     return -3;
